@@ -1,0 +1,11 @@
+## Operator view
+
+Teams experienced the contract engine as a long-running bottleneck: the UI waited on chained calls, and every release felt like a coordinated event. The goal was not “more microservices,” but **measurable relief** at the constraint.
+
+## What the metrics validated
+
+Latency improvements were verified against production traces: cache hit rates, Cosmos RU consumption, and end-to-end contract completion time. The **seven-minute** figure was an operational reality—not a slide estimate.
+
+## If I re-ran the program today
+
+I would invest earlier in **contract testing** between the decomposed services and in **SLO dashboards** that make queue depth and cache effectiveness obvious during incidents.

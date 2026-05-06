@@ -1,26 +1,126 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #080808;
+  --bg-soft: #0f0f0f;
+  --panel: #111111;
+  --ink: #f0ebe2;
+  --ink-muted: #9a9087;
+  --line: rgba(240, 235, 226, 0.08);
+  --accent: #ff4500;
+  --accent-soft: rgba(255, 69, 0, 0.12);
+  --signal: #3dffc0;
+  --signal-soft: rgba(61, 255, 192, 0.12);
+  --cyan: #22d3ee;
+  --green: #10b981;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-panel: var(--panel);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-signal: var(--signal);
+  --color-signal-soft: var(--signal-soft);
+  --font-display: var(--font-bebas);
+  --font-body: var(--font-syne);
+  --font-mono: var(--font-space-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+
+.font-mono-label {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+/* Grain overlay */
+.grain::before {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Grid lines background */
+.grid-lines {
+  background-image:
+    linear-gradient(to right, var(--line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  background-position: center top;
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 3px;
+}
+
+/* MDX prose inside case studies */
+.mdx-content {
+  max-width: 65ch;
+}
+
+.mdx-content h2 {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 1.75rem;
+  letter-spacing: 0.02em;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  color: var(--ink);
+}
+
+.mdx-content p {
+  color: var(--ink-muted);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.mdx-content ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  color: var(--ink-muted);
+  margin-bottom: 1rem;
+}
+
+.mdx-content li {
+  margin-bottom: 0.35rem;
+}
+
+.mdx-content strong {
+  color: var(--ink);
+}
+
+.mdx-content a {
+  color: var(--signal);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.mdx-content a:hover {
+  color: var(--accent);
 }

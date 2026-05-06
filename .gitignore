@@ -19,10 +19,12 @@
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
 *.pem
+Thumbs.db
 
 # debug
 npm-debug.log*
@@ -30,8 +32,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files (do not commit secrets)
+.env
+.env.*
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +43,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# turbopack / tooling
+.turbo
+
+# IDE (optional — remove if you want shared editor settings)
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# logs
+*.log

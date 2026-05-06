@@ -1,0 +1,7 @@
+## Format chaos as a first-class problem
+
+Telemetry normalization is rarely “just parsing.” Formats diverge by OEM, firmware, and ingestion path. The architecture had to **isolate format adapters** while keeping a stable canonical model downstream.
+
+## Streaming plus batch
+
+Kinesis and S3 gave us both **real-time** and **replayable** paths—important when investigations needed to reconstruct a window of fleet behavior.
