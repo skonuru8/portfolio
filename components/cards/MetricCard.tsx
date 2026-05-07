@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useInView, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useDeviceTier } from "@/lib/device-tier";
 
 export type MetricCardProps = {
   value: string;
@@ -34,15 +35,12 @@ function onMouseMove(e: React.MouseEvent<HTMLElement>) {
 
 export function MetricCard({ value, label, description, linkedTo }: MetricCardProps) {
   const reduce = useReducedMotion();
+  const tier = useDeviceTier();
   const valueRef = useRef<HTMLParagraphElement>(null);
   const inViewRef = useRef<HTMLDivElement>(null);
   const inView = useInView(inViewRef, { amount: 0.7 });
-
-  // Track current displayed value across enter/leave cycles — so we always
-  // animate from where we left off, never jump.
   const currentNum = useRef(0);
   const rafRef = useRef(0);
-
   const parsed = parseValue(value);
 
   useEffect(() => {
@@ -51,11 +49,17 @@ export function MetricCard({ value, label, description, linkedTo }: MetricCardPr
     if (!el) return;
 
     const { prefix, num, suffix } = parsed;
-    const target = inView ? num : 0;
+
+    // Tier B: one-shot count-up only. No count-down on leave; no lime flash.
+    // Tier A: bidirectional count-up/down with lime flash on completion.
+    const isLean = tier === "b";
+    const target = inView ? num : isLean ? undefined : 0;
+
+    // Tier B: skip the count-down leg entirely
+    if (target === undefined) return;
+
     const start = currentNum.current;
     const distance = target - start;
-
-    // No-op if we're already at the target
     if (distance === 0) return;
 
     const duration = 800;
@@ -63,14 +67,12 @@ export function MetricCard({ value, label, description, linkedTo }: MetricCardPr
     cancelAnimationFrame(rafRef.current);
 
     const tick = (now: number) => {
-      // Pause when tab hidden — don't burn frames invisibly
       if (document.visibilityState === "hidden") {
         rafRef.current = requestAnimationFrame(tick);
         return;
       }
       const t = Math.min((now - t0) / duration, 1);
-      const eased = easeOut(t);
-      const cur = start + distance * eased;
+      const cur = start + distance * easeOut(t);
       currentNum.current = cur;
       el.textContent = `${prefix}${Math.round(cur)}${suffix}`;
 
@@ -78,14 +80,13 @@ export function MetricCard({ value, label, description, linkedTo }: MetricCardPr
         rafRef.current = requestAnimationFrame(tick);
       } else {
         currentNum.current = target;
-        // Settle on exact final string only when arriving at the up-target.
-        // Going back to 0 doesn't get the lime flash.
         if (target === num) {
           el.textContent = value;
-          el.style.textShadow = "0 0 12px var(--lock-glow)";
-          setTimeout(() => {
-            el.style.textShadow = "";
-          }, 300);
+          // Tier A only: lime glow flash on count-up completion
+          if (!isLean) {
+            el.style.textShadow = "0 0 12px var(--lock-glow)";
+            setTimeout(() => { el.style.textShadow = ""; }, 300);
+          }
         } else {
           el.textContent = `${prefix}0${suffix}`;
         }
@@ -93,20 +94,23 @@ export function MetricCard({ value, label, description, linkedTo }: MetricCardPr
     };
 
     rafRef.current = requestAnimationFrame(tick);
-
     return () => cancelAnimationFrame(rafRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, reduce]);
+  }, [inView, reduce, tier]);
 
+  // Tier B: omit metric-card-aura (radial gradient on GPU is moderately expensive on weak GPUs)
   const cardClass = cn(
-    "metric-card-edge metric-card-aura group card-hover relative block h-full overflow-hidden rounded-xl border border-line bg-panel/80 p-6",
+    "metric-card-edge group card-hover relative block h-full overflow-hidden rounded-xl border border-line bg-panel/80 p-6",
+    tier === "a" && "metric-card-aura",
     "hover:bg-panel",
     linkedTo && "focus-within:ring-2 focus-within:ring-signal",
   );
 
-  // Reduced motion: render the final value statically, no animation, no observer.
-  // Otherwise: start at 0 — the effect counts up when it enters the viewport.
+  // Reduced motion: final value statically. Lean/animated: start at 0 — effect counts up.
   const initialDisplay = reduce ? value : parsed ? `${parsed.prefix}0${parsed.suffix}` : value;
+
+  // Tier B: skip onMouseMove (no aura to position)
+  const moveHandler = tier === "a" ? onMouseMove : undefined;
 
   const inner = (
     <>
@@ -125,15 +129,13 @@ export function MetricCard({ value, label, description, linkedTo }: MetricCardPr
     </>
   );
 
-  // The inViewRef must wrap the rendered element so framer's useInView observes the right node.
-  // Apply it by wrapping cardClass element via a ref-bearing wrapper inside the link/div.
   if (linkedTo) {
     return (
       <div ref={inViewRef}>
         <Link
           href={linkedTo}
           className={cn(cardClass, "focus-ring outline-none")}
-          onMouseMove={onMouseMove as React.MouseEventHandler<HTMLAnchorElement>}
+          onMouseMove={moveHandler as React.MouseEventHandler<HTMLAnchorElement>}
         >
           {inner}
         </Link>
@@ -145,7 +147,7 @@ export function MetricCard({ value, label, description, linkedTo }: MetricCardPr
     <div
       ref={inViewRef}
       className={cardClass}
-      onMouseMove={onMouseMove as React.MouseEventHandler<HTMLDivElement>}
+      onMouseMove={moveHandler as React.MouseEventHandler<HTMLDivElement>}
     >
       {inner}
     </div>

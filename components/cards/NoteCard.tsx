@@ -20,7 +20,7 @@ export function NoteCard({ title, category, date, summary, tags, href }: NoteCar
       </p>
       <h3 className="mt-2 font-display text-xl uppercase tracking-wide text-ink">{title}</h3>
       <p className="mt-2 text-sm text-ink-muted">{summary}</p>
-      <p className="mt-3 text-[10px] text-ink-muted/80">{tags.join(" · ")}</p>
+      <p className="mt-3 text-[10px] text-ink-muted">{tags.join(" · ")}</p>
     </Link>
   );
 }

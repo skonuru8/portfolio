@@ -12,7 +12,9 @@ export function Section({ id, children, className, ariaLabel }: SectionProps) {
     <section
       id={id}
       aria-label={ariaLabel}
-      className={cn("scroll-mt-24 py-16 md:py-24", className)}
+      // contain: layout paint tells the browser nothing inside this section
+      // affects layout or paint outside it — allows skipping offscreen sections.
+      className={cn("scroll-mt-24 py-16 md:py-24 [contain:layout_paint]", className)}
     >
       {children}
     </section>

@@ -101,7 +101,7 @@ export function WorkIndex() {
               role="tab"
               aria-selected={filter === f}
               className={cn(
-                "focus-ring rounded-full border px-3 py-1.5 font-mono-label text-[10px] uppercase tracking-wider",
+                "focus-ring rounded-full border px-3 py-2 font-mono-label text-[10px] uppercase tracking-wider",
                 filter === f
                   ? "border-signal bg-signal-soft text-ink"
                   : "border-line text-ink-muted hover:text-ink",

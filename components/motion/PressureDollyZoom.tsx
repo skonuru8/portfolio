@@ -4,6 +4,7 @@ import { useRef, useEffect, type ReactNode } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { usePrefersReducedMotion, useIsMobile } from "@/lib/motion";
+import { useDeviceTier } from "@/lib/device-tier";
 import { cn } from "@/lib/utils";
 
 if (typeof window !== "undefined") {
@@ -57,45 +58,49 @@ export function PressureDollyZoom({
   const fg = useRef<HTMLDivElement>(null);
   const reduced = usePrefersReducedMotion();
   const mobile = useIsMobile();
+  const tier = useDeviceTier();
   const p = presets[variant];
 
   useEffect(() => {
     if (!root.current || !bg.current || !fg.current || reduced || mobile) return;
 
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        bg.current,
-        { scale: 1, opacity: 0.32 },
-        {
-          scale: p.bgScaleEnd,
-          opacity: p.opacityEnd,
-          ease: "none",
-          scrollTrigger: {
-            trigger: root.current,
-            start: "top 85%",
-            end: "bottom 40%",
-            scrub: 0.6,
-          },
-        },
-      );
-      gsap.fromTo(
-        fg.current,
-        { scale: 1 },
-        {
+      if (tier === "b") {
+        // Tier B: snap-based — animate once on enter, reverse on leave-back.
+        // No per-scroll-pixel work (no scrub).
+        const snapST = {
+          trigger: root.current,
+          start: "top 85%",
+          end: "bottom 40%",
+          toggleActions: "play none none reverse" as const,
+        };
+        gsap.fromTo(bg.current, { scale: 1, opacity: 0.32 }, {
+          scale: p.bgScaleEnd, opacity: p.opacityEnd,
+          ease: "power2.out", duration: 0.6, scrollTrigger: snapST,
+        });
+        gsap.fromTo(fg.current, { scale: 1 }, {
           scale: p.fgScaleEnd,
-          ease: "none",
-          scrollTrigger: {
-            trigger: root.current,
-            start: "top 85%",
-            end: "bottom 40%",
-            scrub: 0.6,
-          },
-        },
-      );
+          ease: "power2.out", duration: 0.6, scrollTrigger: snapST,
+        });
+      } else {
+        // Tier A: full scrub — continuously driven by scroll position
+        const scrubST = {
+          trigger: root.current,
+          start: "top 85%",
+          end: "bottom 40%",
+          scrub: 0.6,
+        };
+        gsap.fromTo(bg.current, { scale: 1, opacity: 0.32 }, {
+          scale: p.bgScaleEnd, opacity: p.opacityEnd, ease: "none", scrollTrigger: scrubST,
+        });
+        gsap.fromTo(fg.current, { scale: 1 }, {
+          scale: p.fgScaleEnd, ease: "none", scrollTrigger: scrubST,
+        });
+      }
     }, root);
 
     return () => ctx.revert();
-  }, [reduced, mobile, variant]);
+  }, [reduced, mobile, tier, variant]);
 
   return (
     <div ref={root} className={cn("relative overflow-visible", className)}>

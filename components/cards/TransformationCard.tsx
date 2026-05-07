@@ -1,8 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import { PressureDollyZoom, type DollyVariant } from "@/components/motion/PressureDollyZoom";
 import { Reveal } from "@/components/motion/Reveal";
 import { ConnectorArrow } from "@/components/motion/ConnectorArrow";
 import { cn } from "@/lib/utils";
+import { useDeviceTier } from "@/lib/device-tier";
 
 export type TransformationCardProps = {
   title: string;
@@ -32,6 +35,7 @@ export function TransformationCard({
   link,
   motionType = "none",
 }: TransformationCardProps) {
+  const tier = useDeviceTier();
   const useDolly = motionType === "pressure-dolly" || motionType === "noise-collapse" || motionType === "risk-to-control";
   const label = dollyLabels[motionType] ?? "Transformation narrative";
   const variant: DollyVariant | undefined = useDolly ? (motionType as DollyVariant) : undefined;
@@ -48,14 +52,17 @@ export function TransformationCard({
       </div>
 
       <div className="mt-8 grid gap-6 md:grid-cols-3">
-        {/* Before panel — liquid blob signals "noise" inside the card */}
+        {/* Before panel — animated noise blob on Tier A, static on Tier B/C */}
         <div
           className={cn(
             "relative overflow-hidden rounded-lg border border-line/80 bg-panel/50 p-4",
             motionType !== "none" && "md:opacity-95",
           )}
         >
-          <div className="liquid-blob-before" aria-hidden />
+          <div
+            className={tier === "a" ? "liquid-blob-before" : "liquid-blob-static"}
+            aria-hidden
+          />
           <p className="relative font-mono-label text-[10px] uppercase tracking-widest text-accent">Before</p>
           <p className="relative mt-2 text-sm text-ink-muted">{before}</p>
         </div>

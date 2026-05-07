@@ -20,28 +20,28 @@ export function HowIThink() {
           <DecisionTrace />
           <ol className="max-w-3xl space-y-3 self-center border-l border-line pl-6">
             {thinkingSequence.map((line, i) => (
-              <Reveal key={line} delay={i * 0.04}>
-                <li className="flex gap-4 rounded px-2 py-0.5 transition-colors" data-thinking-step={i}>
+              <li key={line} className="rounded transition-colors" data-thinking-step={i}>
+                <Reveal delay={i * 0.04} className="flex gap-4 px-2 py-0.5">
                   <span className="font-mono-label text-xs text-signal">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <span className="text-ink-muted">{line}</span>
-                </li>
-              </Reveal>
+                </Reveal>
+              </li>
             ))}
           </ol>
         </div>
 
         <ol className="mb-12 max-w-3xl space-y-3 md:hidden">
           {thinkingSequence.map((line, i) => (
-            <Reveal key={line} delay={i * 0.04}>
-              <li className="flex gap-4 border-l border-line pl-4">
+            <li key={line} className="border-l border-line pl-4">
+              <Reveal delay={i * 0.04} className="flex gap-4">
                 <span className="font-mono-label text-xs text-signal">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <span className="text-ink-muted">{line}</span>
-              </li>
-            </Reveal>
+              </Reveal>
+            </li>
           ))}
         </ol>
 

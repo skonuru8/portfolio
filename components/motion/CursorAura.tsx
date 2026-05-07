@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useDeviceTier } from "@/lib/device-tier";
 
 type Props = {
   /** Lerp coefficient. Lower = slushier. Default 0.08. */
@@ -16,18 +17,21 @@ type Props = {
 export function CursorAura({
   ease = 0.08,
   size = 600,
-  gradient = "radial-gradient(circle, rgba(56,189,248,0.28), rgba(99,102,241,0.14) 40%, transparent 70%)",
+  gradient = "radial-gradient(circle, rgba(56,189,248,0.42), rgba(99,102,241,0.22) 40%, transparent 70%)",
   sectionRef,
 }: Props) {
+  const tier = useDeviceTier();
   const ref = useRef<HTMLDivElement>(null);
   const target = useRef({ x: 0, y: 0 });
   const current = useRef({ x: 0, y: 0 });
   const visible = useRef(false);
 
   useEffect(() => {
+    // Tier A only: mix-blend-mode: screen is one of the most expensive composite
+    // operations in the browser. Tier B/C get no aura — no DOM node, no RAF.
+    if (tier !== "a") return;
     if (typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    // Skip on touch-only devices (no fine hover pointer)
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
     const onMove = (e: MouseEvent) => {
@@ -46,7 +50,6 @@ export function CursorAura({
 
     let raf = 0;
     const tick = () => {
-      // Pause animation when tab is hidden
       if (document.visibilityState === "hidden") {
         raf = requestAnimationFrame(tick);
         return;
@@ -69,7 +72,10 @@ export function CursorAura({
       el.removeEventListener("mouseleave", onLeave as EventListener);
       cancelAnimationFrame(raf);
     };
-  }, [ease, sectionRef]);
+  }, [tier, ease, sectionRef]);
+
+  // Tier B/C: no DOM node at all — no compositor layer, no memory cost.
+  if (tier !== "a") return null;
 
   return (
     <div

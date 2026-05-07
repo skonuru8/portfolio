@@ -10,7 +10,7 @@ function ActionButtons() {
       <a
         href={profile.resumeUrl}
         download
-        className="focus-ring inline-flex items-center gap-2 rounded border border-signal bg-signal-soft px-4 py-2.5 font-mono-label text-xs uppercase tracking-wider text-ink"
+        className="focus-ring inline-flex items-center gap-2 rounded border border-signal bg-signal-soft px-4 py-3 font-mono-label text-xs uppercase tracking-wider text-ink md:py-2.5"
       >
         <FileDown className="h-4 w-4" aria-hidden />
         Download PDF
@@ -19,7 +19,7 @@ function ActionButtons() {
         href={profile.resumeUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="focus-ring inline-flex items-center gap-2 rounded border border-signal bg-signal-soft px-4 py-2.5 font-mono-label text-xs uppercase tracking-wider text-ink hover:border-signal/60"
+        className="focus-ring inline-flex items-center gap-2 rounded border border-signal bg-signal-soft px-4 py-3 font-mono-label text-xs uppercase tracking-wider text-ink hover:border-signal/60 md:py-2.5"
       >
         <ExternalLinkIcon className="h-4 w-4" aria-hidden />
         Open in new tab

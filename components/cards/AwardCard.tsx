@@ -67,7 +67,7 @@ export function AwardCard({ title, organization, year, description, image }: Awa
                 />
               </div>
               <p className="mt-4 text-center text-sm text-ink-muted">{title}</p>
-              <Dialog.Close className="focus-ring mt-4 block w-full rounded border border-line py-2 font-mono-label text-xs uppercase tracking-wider text-ink">
+              <Dialog.Close className="focus-ring mt-4 block w-full rounded border border-line py-3 font-mono-label text-xs uppercase tracking-wider text-ink">
                 Close
               </Dialog.Close>
             </Dialog.Content>

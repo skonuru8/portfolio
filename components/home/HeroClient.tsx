@@ -38,7 +38,7 @@ export function HeroClient({ pdfReady }: { pdfReady: boolean }) {
             signal
           </span>
         </p>
-        <h1 className="font-display mt-4 max-w-4xl text-5xl uppercase leading-[0.95] tracking-wide text-ink md:text-7xl lg:text-8xl">
+        <h1 className="font-display mt-4 max-w-4xl text-3xl uppercase leading-[0.95] tracking-wide text-ink xs:text-5xl md:text-7xl lg:text-8xl">
           {profile.headline}
         </h1>
         <p className="mt-6 max-w-2xl text-base text-ink-muted md:text-lg">{profile.subheadline}</p>
@@ -46,13 +46,13 @@ export function HeroClient({ pdfReady }: { pdfReady: boolean }) {
         <div className="mt-10 flex flex-wrap gap-3">
           <Link
             href="/#transformations"
-            className="focus-ring inline-flex items-center gap-2 rounded border border-accent bg-accent-soft px-4 py-2.5 font-mono-label text-xs uppercase tracking-wider text-ink"
+            className="focus-ring inline-flex items-center gap-2 rounded border border-accent bg-accent-soft px-4 py-3 font-mono-label text-xs uppercase tracking-wider text-ink md:py-2.5"
           >
             View transformations
           </Link>
           <Link
             href="/resume"
-            className="focus-ring inline-flex items-center gap-2 rounded border border-line bg-panel px-4 py-2.5 font-mono-label text-xs uppercase tracking-wider text-ink hover:border-signal/40"
+            className="focus-ring inline-flex items-center gap-2 rounded border border-line bg-panel px-4 py-3 font-mono-label text-xs uppercase tracking-wider text-ink hover:border-signal/40 md:py-2.5"
           >
             View resume
           </Link>
@@ -60,26 +60,26 @@ export function HeroClient({ pdfReady }: { pdfReady: boolean }) {
             <a
               href={profile.resumeUrl}
               download
-              className="focus-ring inline-flex items-center gap-2 rounded border border-accent/35 bg-panel px-4 py-2.5 font-mono-label text-xs uppercase tracking-wider text-ink hover:border-signal/50"
+              className="focus-ring inline-flex items-center gap-2 rounded border border-accent/35 bg-panel px-4 py-3 font-mono-label text-xs uppercase tracking-wider text-ink hover:border-signal/50 md:py-2.5"
             >
               <FileDown className="h-4 w-4" aria-hidden />
               Download resume
             </a>
           ) : (
-            <span className="inline-flex items-center gap-2 rounded border border-dashed border-line px-4 py-2.5 font-mono-label text-xs uppercase tracking-wider text-ink-muted">
+            <span className="inline-flex items-center gap-2 rounded border border-dashed border-line px-4 py-3 font-mono-label text-xs uppercase tracking-wider text-ink-muted md:py-2.5">
               Résumé PDF not published yet
             </span>
           )}
           <ExternalLink
             href={profile.github}
-            className="focus-ring inline-flex items-center gap-2 rounded border border-line bg-panel px-4 py-2.5 font-mono-label text-xs uppercase tracking-wider text-ink-muted hover:text-ink"
+            className="focus-ring inline-flex items-center gap-2 rounded border border-line bg-panel px-4 py-3 font-mono-label text-xs uppercase tracking-wider text-ink-muted hover:text-ink md:py-2.5"
           >
             <Code2 className="h-4 w-4" aria-hidden />
             GitHub
           </ExternalLink>
           <ExternalLink
             href={profile.linkedin}
-            className="focus-ring inline-flex items-center gap-2 rounded border border-line bg-panel px-4 py-2.5 font-mono-label text-xs uppercase tracking-wider text-ink-muted hover:text-ink"
+            className="focus-ring inline-flex items-center gap-2 rounded border border-line bg-panel px-4 py-3 font-mono-label text-xs uppercase tracking-wider text-ink-muted hover:text-ink md:py-2.5"
           >
             <Link2 className="h-4 w-4" aria-hidden />
             LinkedIn

@@ -3,6 +3,7 @@
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useIsMobile } from "@/lib/motion";
+import { useDeviceTier } from "@/lib/device-tier";
 
 const NOISE_WORDS = [
   "delay",
@@ -85,8 +86,29 @@ function SignalLine({
   );
 }
 
+// Static resolved-state div: gradient line drawn, no animation.
+// Used by both Tier C (reduced-motion) and Tier B (lean devices).
+function ResolvedState({ divRef }: { divRef?: React.RefObject<HTMLDivElement | null> }) {
+  return (
+    <div ref={divRef} className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      <div
+        className="absolute"
+        style={{
+          top: `${SIGNAL_Y}%`,
+          left: "4%",
+          right: "4%",
+          height: "2px",
+          background: "linear-gradient(90deg, #38bdf8, #6366f1)",
+          opacity: 0.6,
+        }}
+      />
+    </div>
+  );
+}
+
 export function NoiseToSignalHero() {
   const reduce = useReducedMotion();
+  const tier = useDeviceTier();
   const mobile = useIsMobile();
   const containerRef = useRef<HTMLDivElement>(null);
   const inView = useInView(containerRef, { margin: "0px 0px -20% 0px" });
@@ -97,23 +119,11 @@ export function NoiseToSignalHero() {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  // Reduced motion: render the resolved state, no morph at all.
-  if (reduce) {
-    return (
-      <div ref={containerRef} className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-        <div
-          className="absolute"
-          style={{
-            top: `${SIGNAL_Y}%`,
-            left: "4%",
-            right: "4%",
-            height: "2px",
-            background: "linear-gradient(90deg, #38bdf8, #6366f1)",
-            opacity: 0.6,
-          }}
-        />
-      </div>
-    );
+  // Tier C (reduced-motion) and Tier B (lean): render the fully-resolved state.
+  // Tier B saves ~13 simultaneous Framer Motion animations on first paint.
+  // The lime underscore is handled by the Tier B CSS rule (scaleX(1) immediately).
+  if (reduce || tier === "b") {
+    return <ResolvedState divRef={containerRef} />;
   }
 
   const duration = mobile ? 0.8 : 1.6;

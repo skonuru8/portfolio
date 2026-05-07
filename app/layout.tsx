@@ -3,9 +3,10 @@ import { Bebas_Neue, Syne, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { CommandMenu } from "@/components/layout/CommandMenu";
+import { CommandMenuLoader } from "@/components/layout/CommandMenuLoader";
 import { AmbientShell } from "@/components/layout/AmbientShell";
 import { ScrollProgress } from "@/components/motion/ScrollProgress";
+import { DeviceTierAttribute } from "@/components/layout/DeviceTierAttribute";
 import { getSiteUrl } from "@/lib/site-url";
 
 const bebas = Bebas_Neue({
@@ -51,6 +52,7 @@ export default function RootLayout({
     >
       <body className="grain min-h-full bg-bg text-ink">
         <AmbientShell>
+          <DeviceTierAttribute />
           <ScrollProgress />
           <a
             href="#main"
@@ -63,7 +65,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
-          <CommandMenu />
+          <CommandMenuLoader />
         </AmbientShell>
       </body>
     </html>

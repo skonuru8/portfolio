@@ -7,7 +7,7 @@
   --panel-strong: #102033;
 
   --ink: #eaf2ff;
-  --ink-muted: #64748b;
+  --ink-muted: #8093a8;
   --ink-soft: #94a3b8;
 
   --border: rgba(148, 163, 184, 0.16);
@@ -55,6 +55,8 @@
   --font-display: var(--font-bebas);
   --font-body: var(--font-syne);
   --font-mono: var(--font-space-mono);
+  /* Custom breakpoint: 360px — Galaxy Fold, iPhone SE, small Androids */
+  --breakpoint-xs: 360px;
 }
 
 html {
@@ -331,6 +333,57 @@ body {
   .thinking-flash {
     animation: none;
   }
+}
+
+/* ─── Tier B: Lean-device overrides ──────────────────────────────────────────
+   Applied via html[data-tier="b"] set by DeviceTierAttribute after first paint.
+   Goal: freeze every infinite CSS animation to eliminate compositor work on
+   low-RAM / touch-only / slow-network devices without touching Tier A or Tier C.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* Freeze the infinite ambient animations — biggest single win */
+html[data-tier="b"] .motion-gradient,
+html[data-tier="b"] .liquid-bg,
+html[data-tier="b"] .liquid-blob-before,
+html[data-tier="b"] .ambient-shift {
+  animation: none !important;
+}
+
+/* Keep the gradient border on metric cards but remove its animation */
+html[data-tier="b"] .metric-card-edge::before {
+  animation: none;
+  opacity: 0.3;
+}
+
+/* Hide the grain overlay — compositing a fixed full-viewport pseudo-element
+   is expensive on weak GPUs and adds nothing on small screens */
+html[data-tier="b"] .grain::before {
+  display: none;
+}
+
+/* Draw the hero "signal" underline immediately on Tier B (no morph to wait for) */
+html[data-tier="b"] .hero-signal::after {
+  transform: scaleX(1);
+  transition: none;
+}
+
+/* ─── .liquid-blob-static — same gradient as .liquid-blob-before but frozen ─
+   Used by TransformationCard on Tier B/C instead of the animated class.
+   ──────────────────────────────────────────────────────────────────────────── */
+.liquid-blob-static {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.10;
+  background: radial-gradient(
+    ellipse 70% 55% at center,
+    rgba(56, 189, 248, 0.9),
+    rgba(99, 102, 241, 0.55) 45%,
+    transparent 72%
+  );
+  background-position: 40% 50%;
+  /* No animation — static snapshot of the resolved blob */
 }
 
 /* Hero "Signal" lock underline — draws when [data-in-view="true"] is set, retracts when removed.

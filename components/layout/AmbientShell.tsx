@@ -1,7 +1,10 @@
 import type { ReactNode } from "react";
+import { CursorAura } from "@/components/motion/CursorAura";
 
 /**
  * Faint global depth: grid + slow pan. Content sits above via z-index on main.
+ * CursorAura is mounted here so it's a single global instance, visible across
+ * every section (position: fixed, tracks window mousemove).
  */
 export function AmbientShell({ children }: { children: ReactNode }) {
   return (
@@ -14,6 +17,7 @@ export function AmbientShell({ children }: { children: ReactNode }) {
         className="pointer-events-none fixed inset-0 -z-10 opacity-[0.35] ambient-shift grid-lines"
         aria-hidden
       />
+      <CursorAura />
       {children}
     </div>
   );

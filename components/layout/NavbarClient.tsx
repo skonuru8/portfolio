@@ -75,7 +75,7 @@ export function NavbarClient({ pdfReady }: { pdfReady: boolean }) {
           <li>
             <button
               type="button"
-              aria-label="Open command menu"
+              aria-label={`${modKey === "⌘" ? "⌘K" : "Ctrl K"} — open command menu`}
               onClick={openCommand}
               className="focus-ring rounded border border-line bg-panel px-2 py-1 font-mono-label text-[10px] uppercase tracking-wider text-ink-muted transition-colors hover:border-signal/40 hover:text-ink"
             >
@@ -87,7 +87,7 @@ export function NavbarClient({ pdfReady }: { pdfReady: boolean }) {
         <div className="flex items-center gap-2 md:hidden">
           <button
             type="button"
-            aria-label="Open command menu"
+            aria-label={`${modKey === "⌘" ? "⌘K" : "Ctrl K"} — open command menu`}
             onClick={openCommand}
             className="focus-ring rounded border border-line px-2 py-1 font-mono-label text-[10px] text-ink-muted"
           >
@@ -118,7 +118,7 @@ export function NavbarClient({ pdfReady }: { pdfReady: boolean }) {
             <li key={l.href}>
               <Link
                 href={l.href}
-                className="focus-ring block py-2 font-mono-label text-xs uppercase tracking-wider text-ink-muted"
+                className="focus-ring block py-3.5 font-mono-label text-xs uppercase tracking-wider text-ink-muted"
                 onClick={() => setOpen(false)}
               >
                 {l.label}
@@ -130,7 +130,7 @@ export function NavbarClient({ pdfReady }: { pdfReady: boolean }) {
               <a
                 href={profile.resumeUrl}
                 download
-                className="focus-ring block py-2 font-mono-label text-xs uppercase tracking-wider text-signal"
+                className="focus-ring block py-3.5 font-mono-label text-xs uppercase tracking-wider text-signal"
                 onClick={() => setOpen(false)}
               >
                 Download resume

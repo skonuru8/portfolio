@@ -39,7 +39,7 @@ export default async function NotePage({ params }: Props) {
       </h1>
       <p className="mt-2 text-sm text-ink-muted">{note.date}</p>
       <p className="mt-6 text-ink-muted">{note.summary}</p>
-      <p className="mt-4 text-xs text-ink-muted/80">{note.tags.join(" · ")}</p>
+      <p className="mt-4 text-xs text-ink-muted">{note.tags.join(" · ")}</p>
       {mdxContent ? (
         <div className="mdx-content mt-10 border-t border-line pt-10">{mdxContent}</div>
       ) : null}

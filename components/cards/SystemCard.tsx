@@ -44,7 +44,7 @@ export function SystemCard({
         Stack
       </p>
       <p className="mt-1 text-xs text-ink-muted">{stack.slice(0, 6).join(" · ")}</p>
-      <p className="mt-3 text-[10px] text-ink-muted/80">{tags.join(" · ")}</p>
+      <p className="mt-3 text-[10px] text-ink-muted">{tags.join(" · ")}</p>
     </>
   );
 

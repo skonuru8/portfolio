@@ -3,6 +3,7 @@
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { useIsMobile } from "@/lib/motion";
+import { useDeviceTier } from "@/lib/device-tier";
 import { cn } from "@/lib/utils";
 
 type ParallaxLayerProps = {
@@ -16,13 +17,15 @@ export function ParallaxLayer({ children, className, offset = 64 }: ParallaxLaye
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const mobile = useIsMobile();
+  const tier = useDeviceTier();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
   const y = useTransform(scrollYProgress, [0, 1], [offset, -offset]);
 
-  if (reduce || mobile) {
+  // Tier B/C and mobile: skip the useScroll math — render a plain positioned div.
+  if (reduce || mobile || tier === "b") {
     return <div className={cn("relative", className)}>{children}</div>;
   }
 

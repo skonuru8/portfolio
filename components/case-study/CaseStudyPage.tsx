@@ -141,7 +141,7 @@ export function CaseStudyPage({
               <li key={`${r.kind}-${r.slug}`}>
                 <Link
                   href={`/${r.kind === "system" ? "systems" : "projects"}/${r.slug}`}
-                  className="focus-ring card-hover rounded-full border border-line bg-panel px-4 py-2 font-mono-label text-[10px] uppercase tracking-wider text-signal hover:border-signal/60"
+                  className="focus-ring card-hover rounded-full border border-line bg-panel px-4 py-3 font-mono-label text-[10px] uppercase tracking-wider text-signal hover:border-signal/60 md:py-2"
                 >
                   {r.slug.replace(/-/g, " ")}
                 </Link>
@@ -164,19 +164,19 @@ export function CaseStudyPage({
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href={`mailto:${profile.email}`}
-              className="focus-ring inline-flex rounded border border-signal bg-signal-soft px-4 py-2 font-mono-label text-xs uppercase tracking-wider text-ink"
+              className="focus-ring inline-flex rounded border border-signal bg-signal-soft px-4 py-3 font-mono-label text-xs uppercase tracking-wider text-ink md:py-2"
             >
               Email
             </Link>
             <ExternalLink
               href={profile.linkedin}
-              className="focus-ring inline-flex rounded border border-line px-4 py-2 font-mono-label text-xs uppercase tracking-wider text-ink-muted hover:text-ink"
+              className="focus-ring inline-flex rounded border border-line px-4 py-3 font-mono-label text-xs uppercase tracking-wider text-ink-muted hover:text-ink md:py-2"
             >
               LinkedIn
             </ExternalLink>
             <Link
               href="/resume"
-              className="focus-ring inline-flex rounded border border-line px-4 py-2 font-mono-label text-xs uppercase tracking-wider text-ink-muted hover:text-ink"
+              className="focus-ring inline-flex rounded border border-line px-4 py-3 font-mono-label text-xs uppercase tracking-wider text-ink-muted hover:text-ink md:py-2"
             >
               View resume
             </Link>
@@ -184,7 +184,7 @@ export function CaseStudyPage({
               <a
                 href={profile.resumeUrl}
                 download
-                className="focus-ring inline-flex rounded border border-accent/40 bg-accent-soft px-4 py-2 font-mono-label text-xs uppercase tracking-wider text-ink"
+                className="focus-ring inline-flex rounded border border-accent/40 bg-accent-soft px-4 py-3 font-mono-label text-xs uppercase tracking-wider text-ink md:py-2"
               >
                 Download resume
               </a>

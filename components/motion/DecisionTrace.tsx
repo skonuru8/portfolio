@@ -3,6 +3,7 @@
 import { useRef, useEffect } from "react";
 import { useReducedMotion } from "framer-motion";
 import { useIsMobile } from "@/lib/motion";
+import { useDeviceTier } from "@/lib/device-tier";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -68,6 +69,7 @@ function StaticTrace() {
 
 export function DecisionTrace() {
   const reduce = useReducedMotion();
+  const tier = useDeviceTier();
   const mobile = useIsMobile();
 
   const pathRef = useRef<SVGPathElement>(null);
@@ -82,7 +84,6 @@ export function DecisionTrace() {
     const totalLength = path.getTotalLength();
     gsap.set(path, { strokeDasharray: totalLength, strokeDashoffset: totalLength });
 
-    // Reset node appearances
     circleRefs.current.forEach((el) => {
       if (!el) return;
       el.setAttribute("fill", "var(--bg)");
@@ -90,6 +91,36 @@ export function DecisionTrace() {
     });
     nodeFilled.current.fill(false);
 
+    if (tier === "b") {
+      // Tier B: snap-based — play once on enter, reverse on leave-back.
+      // No per-scroll-pixel work; GSAP only fires on intersection change.
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#thinking",
+          start: "top 65%",
+          end: "bottom 40%",
+          toggleActions: "play none none reverse",
+        },
+      });
+
+      tl.fromTo(
+        path,
+        { strokeDashoffset: totalLength },
+        { strokeDashoffset: 0, duration: 1.2, ease: "power2.out" },
+      );
+
+      // Fill nodes in sequence (no thinking-flash on lean devices)
+      NODE_YS.forEach((_, i) => {
+        const el = circleRefs.current[i];
+        if (!el) return;
+        const { fill, stroke } = nodeColor(i, true);
+        tl.to(el, { attr: { fill, stroke }, duration: 0.15 }, 0.2 + i * 0.22);
+      });
+
+      return () => { tl.scrollTrigger?.kill(); tl.kill(); };
+    }
+
+    // Tier A: full scrub — progress drives every scroll pixel
     const st = ScrollTrigger.create({
       trigger: "#thinking",
       start: "top 65%",
@@ -97,8 +128,6 @@ export function DecisionTrace() {
       scrub: 0.6,
       onUpdate(self) {
         const progress = self.progress;
-
-        // Drive stroke drawing
         gsap.set(path, { strokeDashoffset: totalLength * (1 - progress) });
 
         NODES.forEach((node, i) => {
@@ -110,20 +139,17 @@ export function DecisionTrace() {
 
           if (shouldFill !== wasFilled) {
             nodeFilled.current[i] = shouldFill;
-
             const { fill, stroke } = nodeColor(i, shouldFill);
             el.setAttribute("fill", fill);
             el.setAttribute("stroke", stroke);
 
-            // Flash the corresponding thinking-sequence list item on fill
             if (shouldFill) {
               const listItem = document.querySelector(
-                `[data-thinking-step="${node.step}"]`
+                `[data-thinking-step="${node.step}"]`,
               ) as HTMLElement | null;
               if (listItem) {
-                // Remove first to restart the animation if already running
                 listItem.classList.remove("thinking-flash");
-                void listItem.offsetWidth; // force reflow
+                void listItem.offsetWidth;
                 listItem.classList.add("thinking-flash");
               }
             }
@@ -133,7 +159,7 @@ export function DecisionTrace() {
     });
 
     return () => st.kill();
-  }, [reduce, mobile]);
+  }, [reduce, mobile, tier]);
 
   // Reduced motion: fully-drawn path, resolved state
   if (reduce) {

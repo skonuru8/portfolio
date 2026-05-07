@@ -47,7 +47,7 @@ export function ProjectCard({
         ))}
       </ul>
       <p className="mt-4 text-xs text-ink-muted">{stack.slice(0, 6).join(" · ")}</p>
-      <p className="mt-2 text-[10px] text-ink-muted/80">{tags.join(" · ")}</p>
+      <p className="mt-2 text-[10px] text-ink-muted">{tags.join(" · ")}</p>
     </>
   );
 
