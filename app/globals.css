@@ -22,6 +22,10 @@
   --deep: #6366f1;
   --deep-soft: rgba(99, 102, 241, 0.16);
 
+  --lock: #a3e635;
+  --lock-soft: rgba(163, 230, 53, 0.14);
+  --lock-glow: rgba(163, 230, 53, 0.45);
+
   --success: #2dd4bf;
 
   /* legacy aliases → new tokens (existing utilities keep working) */
@@ -44,6 +48,9 @@
   --color-signal-soft: var(--signal-soft);
   --color-deep: var(--deep);
   --color-deep-soft: var(--deep-soft);
+  --color-lock: var(--lock);
+  --color-lock-soft: var(--lock-soft);
+  --color-lock-glow: var(--lock-glow);
   --color-success: var(--success);
   --font-display: var(--font-bebas);
   --font-body: var(--font-syne);
@@ -234,19 +241,126 @@ body {
     rgba(34, 211, 238, 0.2)
   );
   background-size: 200% 200%;
-  animation: gradient-drift 18s ease infinite alternate;
+  /* Slowed from 18s → 24s so motion is present but calm */
+  animation: gradient-drift 24s ease infinite alternate;
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
-  opacity: 0.55;
+  /* Bumped from 0.55 → 0.7 for more visual presence */
+  opacity: 0.7;
+}
+
+/* Metric card cursor mini-aura — GPU-friendly radial gradient at cursor position */
+.metric-card-aura {
+  --mx: -200px;
+  --my: -200px;
+}
+
+.metric-card-aura::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    circle 150px at var(--mx) var(--my),
+    var(--accent-soft),
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 200ms ease;
+  z-index: 0;
+}
+
+.metric-card-aura:hover::after {
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .metric-card-edge::before {
     animation: none;
     opacity: 0.35;
+  }
+}
+
+/* Transformation "Before" panel — low-opacity noise blob that drifts inside the card */
+.liquid-blob-before {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.10;
+  background: radial-gradient(
+    ellipse 70% 55% at center,
+    rgba(56, 189, 248, 0.9),
+    rgba(99, 102, 241, 0.55) 45%,
+    transparent 72%
+  );
+  background-size: 280% 280%;
+  animation: blob-drift 16s ease-in-out infinite alternate;
+}
+
+@keyframes blob-drift {
+  0%   { background-position: 18% 25%; }
+  40%  { background-position: 72% 55%; }
+  100% { background-position: 35% 78%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-blob-before {
+    animation: none;
+    background-position: 40% 50%;
+  }
+}
+
+/* Decision Trace — cyan background flash on list items as the line passes each node */
+@keyframes thinking-flash {
+  0%   { background-color: transparent; }
+  25%  { background-color: rgba(56, 189, 248, 0.12); }
+  100% { background-color: transparent; }
+}
+
+.thinking-flash {
+  animation: thinking-flash 600ms ease forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thinking-flash {
+    animation: none;
+  }
+}
+
+/* Hero "Signal" lock underline — draws itself at t=2.0s after the morph */
+.hero-signal {
+  position: relative;
+  display: inline-block;
+}
+
+.hero-signal::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  background: var(--lock);
+  transform-origin: left center;
+  transform: scaleX(0);
+  animation: signal-lock-draw 0.4s cubic-bezier(0.22, 1, 0.36, 1) 2.0s forwards;
+}
+
+@keyframes signal-lock-draw {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-signal::after {
+    animation: none;
+    transform: scaleX(1);
   }
 }

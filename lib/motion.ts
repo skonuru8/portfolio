@@ -29,3 +29,18 @@ function getMobileSnapshot() {
 export function useIsMobile(): boolean {
   return useSyncExternalStore(subscribeMobile, getMobileSnapshot, () => false);
 }
+
+function subscribeTouch(callback: () => void) {
+  const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+  mq.addEventListener("change", callback);
+  return () => mq.removeEventListener("change", callback);
+}
+
+function getTouchSnapshot() {
+  // Returns true when the device is touch-only (no fine hover pointer)
+  return !window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+}
+
+export function useIsTouch(): boolean {
+  return useSyncExternalStore(subscribeTouch, getTouchSnapshot, () => false);
+}

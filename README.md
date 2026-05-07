@@ -2,13 +2,15 @@
 
 A modular Next.js portfolio built around the concept **From Noise to Signal**: turning messy, slow, risky workflows into fast, secure, measurable systems.
 
+> **V2 — "The Signal Cathedral"** — see [`portfolio_v2_design_and_cursor_instructions.md`](./portfolio_v2_design_and_cursor_instructions.md) for the full design spec.
+
 ## Tech stack
 
 - [Next.js](https://nextjs.org/) (App Router)
 - TypeScript
-- Tailwind CSS
+- Tailwind CSS v4
 - Framer Motion
-- GSAP (ScrollTrigger for transformation emphasis)
+- GSAP + ScrollTrigger
 - MDX via `next-mdx-remote` (`/content`)
 - Lucide icons, cmdk command palette, Radix Dialog
 
@@ -33,6 +35,48 @@ npm start
 ```bash
 npm run lint
 ```
+
+## V2 design system
+
+### Color tokens (CSS custom properties)
+
+| Token | Value | Usage |
+|---|---|---|
+| `--accent` | `#38bdf8` sky-400 | Primary cyan — links, borders, highlights |
+| `--signal` | `#22d3ee` cyan-400 | Secondary signal color — labels, paths |
+| `--deep` | `#6366f1` indigo-500 | Depth layer — gradients, blobs |
+| `--lock` | `#a3e635` lime-400 | **Signal-lock only** — resolved states |
+
+`--lock` (lime) appears **exactly four places**: hero "signal" underline, metric value flash, transformation Decision left border, How I Think final node. Nowhere else.
+
+### Three signature moments
+
+| # | Name | Section | Effect |
+|---|---|---|---|
+| 1 | **The Resolve** | Hero | Noise words scatter → converge → morph into a cyan→indigo gradient line; lime underline draws on "signal" at t=2s |
+| 2 | **The Decision Trace** | How I Think | GSAP ScrollTrigger drives a 2px cyan SVG path down 5 nodes (Bottleneck→Result); Decision and Result nodes lock to lime |
+| 3 | **The Aura** | Contact | Lerp cursor-tracking blob (`ease=0.08`), `mix-blend-mode: screen`, disabled on touch + reduced motion |
+
+### Reduced motion contract
+
+Every animated effect has a static fallback rendering the **resolved state** (not an empty container):
+
+- Hero morph → gradient line + lime underline shown immediately
+- Decision Trace → fully-drawn path with all nodes filled
+- ConnectorArrow → fully-drawn arrow
+- MetricCard count-up → final value shown immediately, no lock flash
+- Liquid blob → frozen at center position
+- CursorAura → component does not mount
+
+### New components (V2)
+
+| Component | Path | Purpose |
+|---|---|---|
+| `CursorAura` | `components/motion/CursorAura.tsx` | Lerp cursor blob — Contact section |
+| `DecisionTrace` | `components/motion/DecisionTrace.tsx` | Scroll-driven SVG path — How I Think |
+| `ConnectorArrow` | `components/motion/ConnectorArrow.tsx` | Self-drawing SVG arrow — Transformations |
+| `ScrollProgress` | `components/motion/ScrollProgress.tsx` | 2px cyan scroll indicator |
+| `SectionDivider` | `components/layout/SectionDivider.tsx` | 64px gradient fade between sections |
 
 ## Content model
 

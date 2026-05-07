@@ -2,7 +2,7 @@ import { Section } from "@/components/layout/Section";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 import { thinking, thinkingSequence } from "@/data/thinking";
 import { Reveal } from "@/components/motion/Reveal";
-import { ThinkingTrace } from "@/components/motion/ThinkingTrace";
+import { DecisionTrace } from "@/components/motion/DecisionTrace";
 
 export function HowIThink() {
   const cards = thinking.filter((t) => t.visible).sort((a, b) => a.order - b.order);
@@ -17,11 +17,11 @@ export function HowIThink() {
         />
 
         <div className="mb-12 hidden max-w-6xl md:grid md:grid-cols-[minmax(0,140px)_1fr] md:gap-10 lg:gap-14">
-          <ThinkingTrace />
+          <DecisionTrace />
           <ol className="max-w-3xl space-y-3 self-center border-l border-line pl-6">
             {thinkingSequence.map((line, i) => (
               <Reveal key={line} delay={i * 0.04}>
-                <li className="flex gap-4">
+                <li className="flex gap-4 rounded px-2 py-0.5 transition-colors" data-thinking-step={i}>
                   <span className="font-mono-label text-xs text-signal">
                     {String(i + 1).padStart(2, "0")}
                   </span>

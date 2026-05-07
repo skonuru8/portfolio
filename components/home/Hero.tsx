@@ -27,7 +27,7 @@ export function Hero() {
       <NoiseToSignalHero />
       <ParallaxLayer offset={72} className="z-10 mx-auto max-w-6xl px-4 md:px-6">
         <p className="font-mono-label text-xs uppercase tracking-[0.28em] text-signal">
-          From noise to signal
+          From noise to <span className="hero-signal">signal</span>
         </p>
         <h1 className="font-display mt-4 max-w-4xl text-5xl uppercase leading-[0.95] tracking-wide text-ink md:text-7xl lg:text-8xl">
           {profile.headline}

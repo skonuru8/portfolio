@@ -4,6 +4,7 @@ import { profile } from "@/data/profile";
 import { Section } from "@/components/layout/Section";
 import { ExternalLink } from "@/components/ui/ExternalLink";
 import { isResumePdfAvailable } from "@/lib/resume";
+import { CursorAura } from "@/components/motion/CursorAura";
 
 export function ContactPanel() {
   const pdfReady = isResumePdfAvailable();
@@ -14,6 +15,7 @@ export function ContactPanel() {
       ariaLabel="Contact"
       className="relative border-t border-line pb-24"
     >
+      <CursorAura />
       <div
         className="pointer-events-none absolute inset-0 motion-gradient opacity-40"
         style={{
@@ -84,6 +86,14 @@ export function ContactPanel() {
           <Link href="/resume" className="text-signal underline-offset-4 hover:underline">
             Resume page
           </Link>
+        </p>
+
+        {/* Radar metaphor closing line — appears only after the links */}
+        <p
+          className="mt-8 font-mono-label text-[10px] lowercase tracking-[0.22em]"
+          style={{ color: "var(--lock)" }}
+        >
+          signal locked.
         </p>
       </div>
     </Section>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PressureDollyZoom, type DollyVariant } from "@/components/motion/PressureDollyZoom";
 import { Reveal } from "@/components/motion/Reveal";
+import { ConnectorArrow } from "@/components/motion/ConnectorArrow";
 import { cn } from "@/lib/utils";
 
 export type TransformationCardProps = {
@@ -47,24 +48,36 @@ export function TransformationCard({
       </div>
 
       <div className="mt-8 grid gap-6 md:grid-cols-3">
+        {/* Before panel — liquid blob signals "noise" inside the card */}
         <div
           className={cn(
-            "rounded-lg border border-line/80 bg-panel/50 p-4",
+            "relative overflow-hidden rounded-lg border border-line/80 bg-panel/50 p-4",
             motionType !== "none" && "md:opacity-95",
           )}
         >
-          <p className="font-mono-label text-[10px] uppercase tracking-widest text-accent">Before</p>
-          <p className="mt-2 text-sm text-ink-muted">{before}</p>
+          <div className="liquid-blob-before" aria-hidden />
+          <p className="relative font-mono-label text-[10px] uppercase tracking-widest text-accent">Before</p>
+          <p className="relative mt-2 text-sm text-ink-muted">{before}</p>
         </div>
-        <div className="rounded-lg border border-signal/30 bg-signal-soft/30 p-4">
+
+        {/* Decision panel — 3px --lock left border marks where the decision was made */}
+        <div
+          className="rounded-lg border border-signal/30 bg-signal-soft/30 p-4"
+          style={{ borderLeftColor: "var(--lock)", borderLeftWidth: "3px" }}
+        >
           <p className="font-mono-label text-[10px] uppercase tracking-widest text-signal">Decision</p>
           <p className="mt-2 text-sm text-ink">{decision}</p>
         </div>
+
+        {/* After panel */}
         <div className="rounded-lg border border-line/80 bg-panel/50 p-4">
           <p className="font-mono-label text-[10px] uppercase tracking-widest text-accent">After</p>
           <p className="mt-2 text-sm text-ink-muted">{after}</p>
         </div>
       </div>
+
+      {/* Connector arrow — draws itself once on viewport entry; hidden on mobile */}
+      <ConnectorArrow />
 
       <ul className="mt-6 flex flex-wrap gap-2">
         {impact.map((i) => (

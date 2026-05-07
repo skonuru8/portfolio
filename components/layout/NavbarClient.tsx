@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { profile } from "@/data/profile";
+import { MagneticLink } from "@/components/motion/MagneticLink";
 import { cn } from "@/lib/utils";
 
 const SECTION_LINKS = [
@@ -51,22 +52,23 @@ export function NavbarClient({ pdfReady }: { pdfReady: boolean }) {
         <ul className="hidden flex-wrap items-center justify-end gap-1 md:flex lg:gap-2">
           {SECTION_LINKS.map((l) => (
             <li key={l.href}>
-              <Link
+              <MagneticLink
                 href={l.href}
                 className="focus-ring rounded px-2 py-1 font-mono-label text-[10px] uppercase tracking-wider text-ink-muted transition-colors hover:text-ink lg:text-[11px]"
               >
                 {l.label}
-              </Link>
+              </MagneticLink>
             </li>
           ))}
           {pdfReady ? (
             <li>
-              <a
+              <MagneticLink
                 href={profile.resumeUrl}
+                external
                 className="focus-ring rounded px-2 py-1 font-mono-label text-[10px] uppercase tracking-wider text-signal hover:text-accent lg:text-[11px]"
               >
                 Download resume
-              </a>
+              </MagneticLink>
             </li>
           ) : null}
           <li>

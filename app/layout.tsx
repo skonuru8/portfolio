@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CommandMenu } from "@/components/layout/CommandMenu";
 import { AmbientShell } from "@/components/layout/AmbientShell";
+import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import { getSiteUrl } from "@/lib/site-url";
 
 const bebas = Bebas_Neue({
@@ -50,6 +51,7 @@ export default function RootLayout({
     >
       <body className="grain min-h-full bg-bg text-ink">
         <AmbientShell>
+          <ScrollProgress />
           <a
             href="#main"
             className="focus-ring sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded focus:bg-panel focus:px-3 focus:py-2"
