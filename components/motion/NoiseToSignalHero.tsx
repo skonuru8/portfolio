@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { motion, useInView, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { useIsMobile } from "@/lib/motion";
 
 const NOISE_WORDS = [
@@ -42,13 +42,21 @@ const N = NOISE_WORDS.length;
 // Vertical position of the converged signal line (% from top of container)
 const SIGNAL_Y = 46;
 
-// Spread words evenly across the horizontal line
+// Spread words evenly across the horizontal line on convergence
 function targetX(i: number): string {
   return `${4 + i * (90 / (N - 1))}%`;
 }
 
-// The resolved gradient line — shared between static fallback and animated state
-function SignalLine({ animated = false, lineDelay = 0 }: { animated?: boolean; lineDelay?: number }) {
+/**
+ * The cyan→indigo gradient line. Bidirectional: scaleX 0→1 on enter, 1→0 on leave.
+ */
+function SignalLine({
+  inView,
+  delay,
+}: {
+  inView: boolean;
+  delay: number;
+}) {
   const lineStyle: React.CSSProperties = {
     top: `${SIGNAL_Y}%`,
     left: "4%",
@@ -58,17 +66,21 @@ function SignalLine({ animated = false, lineDelay = 0 }: { animated?: boolean; l
     transformOrigin: "left center",
   };
 
-  if (!animated) {
-    return <div className="absolute" style={{ ...lineStyle, opacity: 0.6 }} />;
-  }
-
   return (
     <motion.div
       className="absolute"
       style={lineStyle}
       initial={{ opacity: 0, scaleX: 0 }}
-      animate={{ opacity: 0.6, scaleX: 1 }}
-      transition={{ delay: lineDelay, duration: 0.5, ease: "easeOut" }}
+      animate={{
+        opacity: inView ? 0.6 : 0,
+        scaleX: inView ? 1 : 0,
+      }}
+      transition={{
+        duration: 0.5,
+        ease: "easeOut",
+        // delay only applies on the way in (line draws after morph completes)
+        delay: inView ? delay : 0,
+      }}
     />
   );
 }
@@ -76,6 +88,8 @@ function SignalLine({ animated = false, lineDelay = 0 }: { animated?: boolean; l
 export function NoiseToSignalHero() {
   const reduce = useReducedMotion();
   const mobile = useIsMobile();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(containerRef, { margin: "0px 0px -20% 0px" });
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -83,24 +97,34 @@ export function NoiseToSignalHero() {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  // Reduced motion: render the fully-resolved state immediately — no morph.
+  // Reduced motion: render the resolved state, no morph at all.
   if (reduce) {
     return (
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-        <SignalLine animated={false} />
+      <div ref={containerRef} className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <div
+          className="absolute"
+          style={{
+            top: `${SIGNAL_Y}%`,
+            left: "4%",
+            right: "4%",
+            height: "2px",
+            background: "linear-gradient(90deg, #38bdf8, #6366f1)",
+            opacity: 0.6,
+          }}
+        />
       </div>
     );
   }
 
   const duration = mobile ? 0.8 : 1.6;
-  // Signal line appears just before words finish converging
+  // Signal line draws just after words finish converging (only on enter)
   const lineDelay = mobile ? 0.7 : 1.4;
 
   // Pre-hydration: render words at scattered positions with no animation.
-  // Matches the Framer Motion initial state so there is no visual jump on mount.
+  // Must match the Framer Motion `initial` state exactly to avoid hydration jump.
   if (!mounted) {
     return (
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      <div ref={containerRef} className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
         {NOISE_WORDS.map((word, i) => (
           <span
             key={word}
@@ -120,8 +144,7 @@ export function NoiseToSignalHero() {
   }
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      {/* Noise words converge to a horizontal line then fade out */}
+    <div ref={containerRef} className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
       {NOISE_WORDS.map((word, i) => (
         <motion.span
           key={word}
@@ -132,20 +155,30 @@ export function NoiseToSignalHero() {
             rotate: INITIAL_POS[i].rot,
             opacity: 0.4,
           }}
-          animate={{
-            left: targetX(i),
-            top: `${SIGNAL_Y}%`,
-            rotate: 0,
-            opacity: 0,
-          }}
+          animate={
+            inView
+              ? {
+                  // Converged + faded: words "resolve" into the signal line
+                  left: targetX(i),
+                  top: `${SIGNAL_Y}%`,
+                  rotate: 0,
+                  opacity: 0,
+                }
+              : {
+                  // Re-scattered: original positions restored
+                  left: `${INITIAL_POS[i].x}%`,
+                  top: `${INITIAL_POS[i].y}%`,
+                  rotate: INITIAL_POS[i].rot,
+                  opacity: 0.4,
+                }
+          }
           transition={{ duration, ease: [0.22, 1, 0.36, 1] }}
         >
           {word}
         </motion.span>
       ))}
 
-      {/* Cyan → indigo gradient line draws itself in as words finish converging */}
-      <SignalLine animated lineDelay={lineDelay} />
+      <SignalLine inView={inView} delay={lineDelay} />
     </div>
   );
 }

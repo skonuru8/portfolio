@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-const RESUME_REL = ["public", "resume", "sarath-konuru-resume.pdf"];
+const RESUME_REL = ["public", "resume", "resume.pdf"];
 
 export function getResumePdfAbsolutePath() {
   return path.join(/* turbopackIgnore: true */ process.cwd(), ...RESUME_REL);

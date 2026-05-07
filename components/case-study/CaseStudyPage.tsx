@@ -183,6 +183,7 @@ export function CaseStudyPage({
             {pdfReady ? (
               <a
                 href={profile.resumeUrl}
+                download
                 className="focus-ring inline-flex rounded border border-accent/40 bg-accent-soft px-4 py-2 font-mono-label text-xs uppercase tracking-wider text-ink"
               >
                 Download resume

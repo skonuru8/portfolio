@@ -10,9 +10,13 @@ type MagneticLinkProps = {
   children: React.ReactNode;
   className?: string;
   external?: boolean;
+  /** Pass through to the underlying <a> — useful for download, target, rel, etc. */
+  target?: string;
+  rel?: string;
+  download?: boolean | string;
 };
 
-export function MagneticLink({ href, children, className, external }: MagneticLinkProps) {
+export function MagneticLink({ href, children, className, external, target, rel, download }: MagneticLinkProps) {
   const ref = useRef<HTMLAnchorElement>(null);
   const reduce = useReducedMotion();
   const [pos, setPos] = useState({ x: 0, y: 0 });
@@ -38,6 +42,9 @@ export function MagneticLink({ href, children, className, external }: MagneticLi
         style={style}
         onMouseMove={onMove}
         onMouseLeave={onLeave}
+        target={target}
+        rel={rel}
+        download={download}
       >
         {children}
       </a>

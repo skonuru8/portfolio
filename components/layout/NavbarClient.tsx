@@ -65,6 +65,7 @@ export function NavbarClient({ pdfReady }: { pdfReady: boolean }) {
               <MagneticLink
                 href={profile.resumeUrl}
                 external
+                download
                 className="focus-ring rounded px-2 py-1 font-mono-label text-[10px] uppercase tracking-wider text-signal hover:text-accent lg:text-[11px]"
               >
                 Download resume
@@ -128,6 +129,7 @@ export function NavbarClient({ pdfReady }: { pdfReady: boolean }) {
             <li>
               <a
                 href={profile.resumeUrl}
+                download
                 className="focus-ring block py-2 font-mono-label text-xs uppercase tracking-wider text-signal"
                 onClick={() => setOpen(false)}
               >

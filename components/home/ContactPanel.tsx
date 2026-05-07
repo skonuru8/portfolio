@@ -72,6 +72,7 @@ export function ContactPanel() {
             <li>
               <a
                 href={profile.resumeUrl}
+                download
                 className="focus-ring card-hover inline-flex items-center gap-2 rounded border border-accent/35 bg-panel px-4 py-3 font-mono-label text-xs uppercase tracking-wider text-ink-muted hover:text-ink"
               >
                 <FileDown className="h-4 w-4" aria-hidden />

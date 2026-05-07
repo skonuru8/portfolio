@@ -7,7 +7,9 @@ export const profile = {
   email: "konurusarath@gmail.com",
   linkedin: "https://linkedin.com/in/konurusarath",
   github: "https://github.com/skonuru8",
-  resumeUrl: "/resume/sarath-konuru-resume.pdf",
+  // Bump ?v=N every time the PDF file content is replaced,
+  // otherwise browsers may serve the stale cached copy.
+  resumeUrl: "/resume/resume.pdf?v=1",
   resumeLastUpdated: "May 2026",
   headline:
     "I turn messy, slow, risky workflows into fast, secure, measurable systems.",

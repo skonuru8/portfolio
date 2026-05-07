@@ -333,7 +333,9 @@ body {
   }
 }
 
-/* Hero "Signal" lock underline — draws itself at t=2.0s after the morph */
+/* Hero "Signal" lock underline — draws when [data-in-view="true"] is set, retracts when removed.
+   Replaces the old fixed-delay CSS animation so it tracks viewport state instead of page load,
+   and so it reverses on scroll-up. */
 .hero-signal {
   position: relative;
   display: inline-block;
@@ -349,18 +351,19 @@ body {
   background: var(--lock);
   transform-origin: left center;
   transform: scaleX(0);
-  animation: signal-lock-draw 0.4s cubic-bezier(0.22, 1, 0.36, 1) 2.0s forwards;
+  /* Default transition (used when retracting): no delay, snappy */
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@keyframes signal-lock-draw {
-  to {
-    transform: scaleX(1);
-  }
+.hero-signal[data-in-view="true"]::after {
+  transform: scaleX(1);
+  /* On enter, wait for the noise morph to converge before drawing */
+  transition-delay: 0.6s;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-signal::after {
-    animation: none;
+    transition: none;
     transform: scaleX(1);
   }
 }
