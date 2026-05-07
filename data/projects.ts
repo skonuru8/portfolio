@@ -67,6 +67,14 @@ export const projects: ProjectEntry[] = [
       ],
       architectureSummary:
         "Node ingestion workers, Python scoring services, PostgreSQL for artifacts, Redis for ephemeral ranking state, React operator UI.",
+      architectureFlow: [
+        { label: "Job Boards", detail: "Raw listings from multiple sources" },
+        { label: "Extraction", detail: "Normalize role content and requirements" },
+        { label: "Fit Scoring", detail: "Skill, seniority, and alignment signals" },
+        { label: "Artifact Generation", detail: "Tailored resume and cover letter" },
+        { label: "Review UI", detail: "Ranked apply queue and triage" },
+        { label: "Application Tracking", detail: "One-click status management" },
+      ],
       impact: [
         "3+ hours to <30 minutes daily review",
         ">70% reduction in low-fit noise",
@@ -124,6 +132,14 @@ export const projects: ProjectEntry[] = [
       ],
       architectureSummary:
         "VS Code extension host, Node analysis workers, provider adapters with shared sanitization layer.",
+      architectureFlow: [
+        { label: "Git Diff", detail: "Staged changes before commit" },
+        { label: "Local Scanner", detail: "Static rules and fast local checks" },
+        { label: "Sanitizer", detail: "Strip sensitive content before external review" },
+        { label: "LLM Review", detail: "Contextual privacy reasoning" },
+        { label: "Risk Report", detail: "Explain violations and safer alternatives" },
+        { label: "Allow / Block", detail: "Commit decision before leakage" },
+      ],
       impact: ["60% fewer LLM calls", "100% outbound sanitization", "Coverage across code and dependency surfaces"],
       improveNow: [
         "Team policies for custom secret patterns",

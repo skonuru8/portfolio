@@ -21,17 +21,17 @@ export function AwardCard({ title, organization, year, description, image }: Awa
       <article className="rounded-xl border border-line bg-panel/60 p-5">
         <button
           type="button"
-          className="focus-ring w-full text-left outline-none"
+          className="focus-ring group w-full text-left outline-none"
           onClick={() => hasImage && setOpen(true)}
           disabled={!hasImage}
         >
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-bg-soft">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-bg-soft transition-transform duration-300 group-hover:scale-[1.02]">
             {hasImage ? (
               <Image
                 src={image!}
                 alt={`${title} — ${organization}`}
                 fill
-                className="object-cover opacity-90 transition-opacity hover:opacity-100"
+                className="object-cover opacity-90 transition-opacity group-hover:opacity-100"
                 sizes="(max-width:768px) 100vw, 320px"
               />
             ) : (

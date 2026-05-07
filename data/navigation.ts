@@ -21,7 +21,7 @@ export const commandItems = [
   { label: "Privacy Guard", href: "/projects/privacy-guard", keywords: "vscode security" },
   { label: "Work Index", href: "/#work", keywords: "projects systems" },
   { label: "Recognition", href: "/#recognition", keywords: "awards" },
-  { label: "Download Resume", href: "/resume", keywords: "pdf cv" },
+  { label: "View Resume", href: "/resume", keywords: "pdf cv page" },
   { label: "Email Sarath", href: "mailto:konurusarath@gmail.com", keywords: "contact" },
   { label: "GitHub", href: "https://github.com/skonuru8", keywords: "code" },
   { label: "LinkedIn", href: "https://linkedin.com/in/konurusarath", keywords: "profile" },

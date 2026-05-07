@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PressureDollyZoom } from "@/components/motion/PressureDollyZoom";
+import { PressureDollyZoom, type DollyVariant } from "@/components/motion/PressureDollyZoom";
 import { Reveal } from "@/components/motion/Reveal";
 import { cn } from "@/lib/utils";
 
@@ -33,9 +33,10 @@ export function TransformationCard({
 }: TransformationCardProps) {
   const useDolly = motionType === "pressure-dolly" || motionType === "noise-collapse" || motionType === "risk-to-control";
   const label = dollyLabels[motionType] ?? "Transformation narrative";
+  const variant: DollyVariant | undefined = useDolly ? (motionType as DollyVariant) : undefined;
 
   const body = (
-    <article className="rounded-2xl border border-line bg-bg-soft/90 p-6 md:p-8">
+    <article className="card-hover rounded-2xl border border-line bg-bg-soft/90 p-6 md:p-8">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <h3 className="font-display text-2xl uppercase tracking-wide text-ink md:text-3xl">
           {title}
@@ -87,8 +88,10 @@ export function TransformationCard({
 
   return (
     <Reveal>
-      {useDolly ? (
-        <PressureDollyZoom label={label}>{body}</PressureDollyZoom>
+      {useDolly && variant ? (
+        <PressureDollyZoom label={label} variant={variant}>
+          {body}
+        </PressureDollyZoom>
       ) : (
         body
       )}

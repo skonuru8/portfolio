@@ -4,6 +4,8 @@ import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CommandMenu } from "@/components/layout/CommandMenu";
+import { AmbientShell } from "@/components/layout/AmbientShell";
+import { getSiteUrl } from "@/lib/site-url";
 
 const bebas = Bebas_Neue({
   weight: "400",
@@ -22,13 +24,8 @@ const spaceMono = Space_Mono({
   variable: "--font-space-mono",
 });
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL != null && process.env.NEXT_PUBLIC_SITE_URL.length > 0
-    ? process.env.NEXT_PUBLIC_SITE_URL
-    : "http://localhost:3000";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(getSiteUrl()),
   title: "Sarath Konuru | Senior Software Engineer",
   description:
     "Senior Software Engineer building cloud-native systems across Java, Node.js, Python, Azure, AWS, GCP, workflow automation, and AI tooling.",
@@ -52,18 +49,20 @@ export default function RootLayout({
       className={`${bebas.variable} ${syne.variable} ${spaceMono.variable} h-full antialiased`}
     >
       <body className="grain min-h-full bg-bg text-ink">
-        <a
-          href="#main"
-          className="focus-ring sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded focus:bg-panel focus:px-3 focus:py-2"
-        >
-          Skip to content
-        </a>
-        <Navbar />
-        <main id="main" className="relative z-10 min-h-[60vh]">
-          {children}
-        </main>
-        <Footer />
-        <CommandMenu />
+        <AmbientShell>
+          <a
+            href="#main"
+            className="focus-ring sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded focus:bg-panel focus:px-3 focus:py-2"
+          >
+            Skip to content
+          </a>
+          <Navbar />
+          <main id="main" className="relative z-10 min-h-[60vh]">
+            {children}
+          </main>
+          <Footer />
+          <CommandMenu />
+        </AmbientShell>
       </body>
     </html>
   );

@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { getVisibleNotes, getNoteBySlug } from "@/data/notes";
+import { loadNoteMdx } from "@/lib/load-mdx";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -8,13 +10,27 @@ export function generateStaticParams() {
   return getVisibleNotes().map((n) => ({ slug: n.slug }));
 }
 
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const note = getNoteBySlug(slug);
+  if (!note) {
+    return { title: "Note Not Found | Sarath Konuru" };
+  }
+  return {
+    title: `${note.title} | Sarath Konuru`,
+    description: note.summary,
+  };
+}
+
 export default async function NotePage({ params }: Props) {
   const { slug } = await params;
   const note = getNoteBySlug(slug);
   if (!note) notFound();
 
+  const mdxContent = await loadNoteMdx(slug);
+
   return (
-    <div className="mx-auto max-w-3xl px-4 py-16 md:px-6">
+    <article className="mx-auto max-w-3xl px-4 py-16 md:px-6">
       <p className="font-mono-label text-[10px] uppercase tracking-widest text-signal">
         System notes · {note.category}
       </p>
@@ -24,12 +40,12 @@ export default async function NotePage({ params }: Props) {
       <p className="mt-2 text-sm text-ink-muted">{note.date}</p>
       <p className="mt-6 text-ink-muted">{note.summary}</p>
       <p className="mt-4 text-xs text-ink-muted/80">{note.tags.join(" · ")}</p>
-      <p className="mt-10 text-sm text-ink-muted">
-        Full MDX body can be wired when this note is published.
-      </p>
-      <Link href="/#work" className="mt-8 inline-block text-signal hover:underline">
-        ← Work index
+      {mdxContent ? (
+        <div className="mdx-content mt-10 border-t border-line pt-10">{mdxContent}</div>
+      ) : null}
+      <Link href="/" className="mt-10 inline-block text-signal hover:underline">
+        ← Home
       </Link>
-    </div>
+    </article>
   );
 }

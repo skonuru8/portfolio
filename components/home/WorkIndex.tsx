@@ -7,12 +7,10 @@ import { SystemCard } from "@/components/cards/SystemCard";
 import { ProjectCard } from "@/components/cards/ProjectCard";
 import { SkillGroupCard } from "@/components/cards/SkillGroupCard";
 import { ExperienceCard } from "@/components/cards/ExperienceCard";
-import { NoteCard } from "@/components/cards/NoteCard";
 import { getVisibleSystems } from "@/data/systems";
 import { getVisibleProjects } from "@/data/projects";
 import { getVisibleExperience } from "@/data/experience";
 import { getVisibleSkills } from "@/data/skills";
-import { getVisibleNotes } from "@/data/notes";
 import { workFilters, type WorkFilter } from "@/data/navigation";
 import { cn } from "@/lib/utils";
 
@@ -82,8 +80,6 @@ export function WorkIndex() {
 
   const experience = getVisibleExperience();
   const skills = getVisibleSkills();
-  const notes = getVisibleNotes();
-
   return (
     <Section id="work" ariaLabel="Work index" className="bg-bg-soft/30">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
@@ -182,24 +178,6 @@ export function WorkIndex() {
           </div>
         </div>
 
-        {notes.length ? (
-          <div className="mt-16">
-            <h3 className="font-display text-3xl uppercase tracking-wide text-ink">System notes</h3>
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              {notes.map((n) => (
-                <NoteCard
-                  key={n.slug}
-                  title={n.title}
-                  category={n.category}
-                  date={n.date}
-                  summary={n.summary}
-                  tags={n.tags}
-                  href={`/notes/${n.slug}`}
-                />
-              ))}
-            </div>
-          </div>
-        ) : null}
       </div>
     </Section>
   );

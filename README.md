@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sarath Konuru Portfolio
 
-## Getting Started
+A modular Next.js portfolio built around the concept **From Noise to Signal**: turning messy, slow, risky workflows into fast, secure, measurable systems.
 
-First, run the development server:
+## Tech stack
+
+- [Next.js](https://nextjs.org/) (App Router)
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- GSAP (ScrollTrigger for transformation emphasis)
+- MDX via `next-mdx-remote` (`/content`)
+- Lucide icons, cmdk command palette, Radix Dialog
+
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open the URL shown in the terminal (for example `http://localhost:3000`).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## Lint
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run lint
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Content model
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Structured content lives in **`/data`**. Long-form case-study copy can extend **`/content`** (`.mdx` per system, project, or note).
 
-## Deploy on Vercel
+Control visibility and ordering with:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `visible`
+- `featured`
+- `order`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Filter and sort in data helpers (for example `getVisibleSystems()`) instead of deleting entries.
+
+## Adding a system
+
+1. Open `data/systems.ts`.
+2. Add an entry with `slug`, summary fields, `tags`, and a `detail` object (including optional `architectureFlow` steps).
+3. Optionally add `content/systems/<slug>.mdx`.
+
+Routes are generated from visible systems.
+
+## Adding a project
+
+1. Open `data/projects.ts`.
+2. Add an entry with `slug`, `detail`, and optional `architectureFlow`.
+3. Optionally add `content/projects/<slug>.mdx`.
+
+## Awards and images
+
+1. Place images under `public/awards/` (see paths in `data/awards.ts`).
+2. Update `data/awards.ts` with titles, copy, and `image` paths.
+
+## Project screenshots
+
+Add files under `public/projects/` and reference them in `data/projects.ts` (`screenshots` array) when you wire gallery UI.
+
+## Resume PDF
+
+Place the file at:
+
+`public/resume/sarath-konuru-resume.pdf`
+
+The app **detects this file on disk**. When it exists, **Download resume** appears (hero, contact, navbar, case-study CTA). The **`/resume`** route is always labeled **View resume**; the PDF link is labeled **Download resume**.
+
+Set `NEXT_PUBLIC_SITE_URL` for correct canonical URLs in production.
+
+## System notes
+
+Notes are **hidden from the Work Index** until you set `visible: true` on entries in `data/notes.ts`. When visible, add `content/notes/<slug>.mdx` and the note page renders full MDX.
+
+## Motion and reduced motion
+
+- Parallax, gradients, and GSAP effects scale down or disable on **small viewports** and when **`prefers-reduced-motion: reduce`** is set.
+- Prefer testing with your OS “Reduce motion” setting in both states.
+
+## Deploying to Netlify
+
+1. Connect the repo and use the Netlify Next.js runtime (this repo includes `netlify.toml` with `@netlify/plugin-nextjs`).
+2. **Build command:** `npm run build` (default from `netlify.toml`).
+3. **Environment variables:** set `NEXT_PUBLIC_SITE_URL` to your live site origin (no trailing slash), for example `https://sarathkonuru.dev`.
+
+Do not use `output: "export"` unless you intentionally move to a fully static host; Netlify’s Next plugin expects the standard Next build.
+
+## Environment variables
+
+Copy `.env.example` to `.env.local` and adjust:
+
+| Variable                 | Purpose                                      |
+| ------------------------ | -------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`   | Canonical site URL for OG, sitemap, robots |

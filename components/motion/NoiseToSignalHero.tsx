@@ -5,16 +5,16 @@ import { useEffect, useState } from "react";
 import { useIsMobile } from "@/lib/motion";
 
 const NOISE_WORDS = [
-  "latency",
-  "manual review",
+  "delay",
   "risk",
-  "handoff",
-  "queue",
   "rework",
-  "unclear ownership",
-  "deployment friction",
-  "slow workflow",
-  "sensitive data",
+  "manual review",
+  "handoff",
+  "latency",
+  "ambiguity",
+  "queue",
+  "bottleneck",
+  "noise",
 ] as const;
 
 function fmtPct(n: number) {

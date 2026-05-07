@@ -16,3 +16,10 @@ export async function loadProjectMdx(slug: string) {
   const source = fs.readFileSync(file, "utf8");
   return MDXRemote({ source, components: mdxComponents });
 }
+
+export async function loadNoteMdx(slug: string) {
+  const file = path.join(process.cwd(), "content/notes", `${slug}.mdx`);
+  if (!fs.existsSync(file)) return null;
+  const source = fs.readFileSync(file, "utf8");
+  return MDXRemote({ source, components: mdxComponents });
+}

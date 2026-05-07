@@ -19,8 +19,13 @@ export function CommandMenu() {
         setOpen((o) => !o);
       }
     };
+    const onOpen = () => setOpen(true);
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("portfolio:open-command-palette", onOpen);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("portfolio:open-command-palette", onOpen);
+    };
   }, []);
 
   return (
@@ -54,7 +59,9 @@ export function CommandMenu() {
                     value={`${item.label} ${item.keywords}`}
                     onSelect={() => {
                       setOpen(false);
-                      if (item.href.startsWith("http") || item.href.startsWith("mailto:")) {
+                      if (item.href.startsWith("http")) {
+                        window.open(item.href, "_blank", "noopener,noreferrer");
+                      } else if (item.href.startsWith("mailto:")) {
                         window.location.href = item.href;
                       } else {
                         router.push(item.href);

@@ -52,7 +52,7 @@ export function ProjectCard({
   );
 
   const shell =
-    "block h-full rounded-xl border border-line bg-panel/70 p-5 transition-colors hover:border-signal/35";
+    "card-hover block h-full rounded-xl border border-line bg-panel/70 p-5 hover:border-signal/35";
 
   if (link) {
     return (

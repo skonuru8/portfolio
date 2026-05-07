@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { profile } from "@/data/profile";
+import { ExternalLink } from "@/components/ui/ExternalLink";
 
 export function Footer() {
   return (
@@ -17,14 +18,14 @@ export function Footer() {
           <Link className="focus-ring text-ink-muted hover:text-signal" href={`mailto:${profile.email}`}>
             Email
           </Link>
-          <Link className="focus-ring text-ink-muted hover:text-signal" href={profile.linkedin}>
+          <ExternalLink className="focus-ring text-ink-muted hover:text-signal" href={profile.linkedin}>
             LinkedIn
-          </Link>
-          <Link className="focus-ring text-ink-muted hover:text-signal" href={profile.github}>
+          </ExternalLink>
+          <ExternalLink className="focus-ring text-ink-muted hover:text-signal" href={profile.github}>
             GitHub
-          </Link>
+          </ExternalLink>
           <Link className="focus-ring text-ink-muted hover:text-signal" href="/resume">
-            Resume
+            View resume
           </Link>
         </div>
       </div>

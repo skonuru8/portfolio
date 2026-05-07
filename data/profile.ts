@@ -9,8 +9,6 @@ export const profile = {
   github: "https://github.com/skonuru8",
   resumeUrl: "/resume/sarath-konuru-resume.pdf",
   resumeLastUpdated: "May 2026",
-  /** Set true when PDF exists in public/resume */
-  resumeAvailable: false,
   headline:
     "I turn messy, slow, risky workflows into fast, secure, measurable systems.",
   subheadline:

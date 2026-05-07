@@ -3,8 +3,17 @@ import { SectionHeader } from "@/components/layout/SectionHeader";
 import { BeforeAfterDiagram } from "@/components/diagrams/BeforeAfterDiagram";
 import { SimpleFlowDiagram } from "@/components/diagrams/SimpleFlowDiagram";
 import { profile } from "@/data/profile";
-import type { CaseStudyDetail } from "@/types/content";
+import type { ArchitectureFlowStep, CaseStudyDetail } from "@/types/content";
 import type { ReactNode } from "react";
+import { ExternalLink } from "@/components/ui/ExternalLink";
+import { isResumePdfAvailable } from "@/lib/resume";
+
+const FALLBACK_FLOW: ArchitectureFlowStep[] = [
+  { label: "Ingress", detail: "Events & requests" },
+  { label: "Core services", detail: "Domain logic" },
+  { label: "Data", detail: "Durable state" },
+  { label: "Delivery", detail: "CI/CD & observability" },
+];
 
 type CaseStudyPageProps = {
   kind: "system" | "project";
@@ -25,6 +34,9 @@ export function CaseStudyPage({
   detail,
   mdxContent,
 }: CaseStudyPageProps) {
+  const pdfReady = isResumePdfAvailable();
+  const flowSteps = detail.architectureFlow ?? FALLBACK_FLOW;
+
   return (
     <article className="relative">
       <header className="border-b border-line bg-bg-soft/50 py-16 md:py-20">
@@ -44,39 +56,33 @@ export function CaseStudyPage({
       </header>
 
       <div className="mx-auto max-w-6xl space-y-16 px-4 py-16 md:px-6">
-        <section aria-labelledby="ctx">
-          <SectionHeader eyebrow="01" title="Context" />
-          <p id="ctx" className="max-w-3xl text-ink-muted">
-            {detail.context}
-          </p>
+        <section aria-labelledby="case-context-heading">
+          <SectionHeader id="case-context-heading" eyebrow="01" title="Context" />
+          <p className="max-w-3xl text-ink-muted">{detail.context}</p>
         </section>
 
-        <section aria-labelledby="pressure">
-          <SectionHeader eyebrow="02" title="Pressure / problem" />
-          <p id="pressure" className="max-w-3xl text-ink-muted">
-            {detail.pressure}
-          </p>
+        <section aria-labelledby="case-pressure-heading">
+          <SectionHeader id="case-pressure-heading" eyebrow="02" title="Pressure / problem" />
+          <p className="max-w-3xl text-ink-muted">{detail.pressure}</p>
         </section>
 
-        <section aria-labelledby="constraints">
-          <SectionHeader eyebrow="03" title="Constraints" />
-          <ul id="constraints" className="max-w-3xl list-disc space-y-2 pl-5 text-ink-muted">
+        <section aria-labelledby="case-constraints-heading">
+          <SectionHeader id="case-constraints-heading" eyebrow="03" title="Constraints" />
+          <ul className="max-w-3xl list-disc space-y-2 pl-5 text-ink-muted">
             {detail.constraints.map((c) => (
               <li key={c}>{c}</li>
             ))}
           </ul>
         </section>
 
-        <section aria-labelledby="decision">
-          <SectionHeader eyebrow="04" title="Decision" />
-          <p id="decision" className="max-w-3xl text-ink-muted">
-            {detail.decision}
-          </p>
+        <section aria-labelledby="case-decision-heading">
+          <SectionHeader id="case-decision-heading" eyebrow="04" title="Decision" />
+          <p className="max-w-3xl text-ink-muted">{detail.decision}</p>
         </section>
 
-        <section aria-labelledby="tradeoffs">
-          <SectionHeader eyebrow="05" title="Tradeoffs" />
-          <ul id="tradeoffs" className="max-w-3xl space-y-4">
+        <section aria-labelledby="case-tradeoffs-heading">
+          <SectionHeader id="case-tradeoffs-heading" eyebrow="05" title="Tradeoffs" />
+          <ul className="max-w-3xl space-y-4">
             {detail.tradeoffs.map((t, i) => (
               <li
                 key={i}
@@ -95,25 +101,16 @@ export function CaseStudyPage({
           </ul>
         </section>
 
-        <section aria-labelledby="arch">
-          <SectionHeader eyebrow="06" title="Architecture / flow" />
-          <p id="arch" className="max-w-3xl text-ink-muted">
-            {detail.architectureSummary}
-          </p>
+        <section aria-labelledby="case-arch-heading">
+          <SectionHeader id="case-arch-heading" eyebrow="06" title="Architecture / flow" />
+          <p className="max-w-3xl text-ink-muted">{detail.architectureSummary}</p>
           <div className="mt-8">
-            <SimpleFlowDiagram
-              steps={[
-                { label: "Ingress", detail: "Events & requests" },
-                { label: "Core services", detail: "Domain logic" },
-                { label: "Data", detail: "Durable state" },
-                { label: "Delivery", detail: "CI/CD & observability" },
-              ]}
-            />
+            <SimpleFlowDiagram steps={flowSteps} />
           </div>
         </section>
 
-        <section aria-labelledby="impact">
-          <SectionHeader eyebrow="07" title="Impact" />
+        <section aria-labelledby="case-impact-heading">
+          <SectionHeader id="case-impact-heading" eyebrow="07" title="Impact" />
           <BeforeAfterDiagram
             beforeLabel="What was breaking"
             afterLabel="Measured outcomes"
@@ -122,9 +119,9 @@ export function CaseStudyPage({
           />
         </section>
 
-        <section aria-labelledby="improve">
-          <SectionHeader eyebrow="08" title="What I would improve now" />
-          <ul id="improve" className="max-w-3xl list-disc space-y-2 pl-5 text-ink-muted">
+        <section aria-labelledby="case-improve-heading">
+          <SectionHeader id="case-improve-heading" eyebrow="08" title="What I would improve now" />
+          <ul className="max-w-3xl list-disc space-y-2 pl-5 text-ink-muted">
             {detail.improveNow.map((x) => (
               <li key={x}>{x}</li>
             ))}
@@ -137,14 +134,14 @@ export function CaseStudyPage({
           </section>
         ) : null}
 
-        <section aria-labelledby="related">
-          <SectionHeader eyebrow="09" title="Related work" />
-          <ul id="related" className="flex flex-wrap gap-3">
+        <section aria-labelledby="case-related-heading">
+          <SectionHeader id="case-related-heading" eyebrow="09" title="Related work" />
+          <ul className="flex flex-wrap gap-3">
             {detail.related.map((r) => (
               <li key={`${r.kind}-${r.slug}`}>
                 <Link
                   href={`/${r.kind === "system" ? "systems" : "projects"}/${r.slug}`}
-                  className="focus-ring rounded-full border border-line bg-panel px-4 py-2 font-mono-label text-[10px] uppercase tracking-wider text-signal hover:border-signal/60"
+                  className="focus-ring card-hover rounded-full border border-line bg-panel px-4 py-2 font-mono-label text-[10px] uppercase tracking-wider text-signal hover:border-signal/60"
                 >
                   {r.slug.replace(/-/g, " ")}
                 </Link>
@@ -155,9 +152,9 @@ export function CaseStudyPage({
 
         <section
           className="rounded-2xl border border-line bg-panel/60 p-8"
-          aria-labelledby="cta"
+          aria-labelledby="case-cta-heading"
         >
-          <h2 id="cta" className="font-display text-2xl uppercase tracking-wide text-ink">
+          <h2 id="case-cta-heading" className="font-display text-2xl uppercase tracking-wide text-ink">
             Continue the conversation
           </h2>
           <p className="mt-3 text-ink-muted">
@@ -171,18 +168,26 @@ export function CaseStudyPage({
             >
               Email
             </Link>
-            <Link
+            <ExternalLink
               href={profile.linkedin}
               className="focus-ring inline-flex rounded border border-line px-4 py-2 font-mono-label text-xs uppercase tracking-wider text-ink-muted hover:text-ink"
             >
               LinkedIn
-            </Link>
+            </ExternalLink>
             <Link
               href="/resume"
               className="focus-ring inline-flex rounded border border-line px-4 py-2 font-mono-label text-xs uppercase tracking-wider text-ink-muted hover:text-ink"
             >
-              Resume
+              View resume
             </Link>
+            {pdfReady ? (
+              <a
+                href={profile.resumeUrl}
+                className="focus-ring inline-flex rounded border border-accent/40 bg-accent-soft px-4 py-2 font-mono-label text-xs uppercase tracking-wider text-ink"
+              >
+                Download resume
+              </a>
+            ) : null}
           </div>
         </section>
       </div>

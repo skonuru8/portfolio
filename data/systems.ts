@@ -81,6 +81,14 @@ export const systems: SystemEntry[] = [
       ],
       architectureSummary:
         "Inbound contract events through Azure Service Bus, core Spring Boot services with Redis-backed read models where appropriate, Cosmos DB as system of record, pipelines through Azure DevOps.",
+      architectureFlow: [
+        { label: "CPQ Portal", detail: "Contract request entry point" },
+        { label: "Contract Case", detail: "Business-critical contract orchestration" },
+        { label: "Azure Service Bus", detail: "Async cross-service integration" },
+        { label: "Redis", detail: "High-value cached reads" },
+        { label: "Cosmos DB", detail: "Contract and quote state" },
+        { label: "Quote / Order Services", detail: "Downstream quote-to-cash flow" },
+      ],
       impact: [
         "Contract processing from ~7 minutes to under 1 minute",
         "~55% API latency reduction on optimized paths",
@@ -150,6 +158,14 @@ export const systems: SystemEntry[] = [
       ],
       architectureSummary:
         "Angular clients against Spring Boot APIs, Camunda orchestration, SQL Server persistence, Keycloak at the edge for authZ.",
+      architectureFlow: [
+        { label: "Email Trigger", detail: "Appeals intake and workflow start" },
+        { label: "Camunda BPMN", detail: "Workflow orchestration and subprocesses" },
+        { label: "Spring Boot API", detail: "Business logic and task operations" },
+        { label: "Angular Dashboard", detail: "Manual ticketing and queue visibility" },
+        { label: "SQL Server Reports", detail: "Client-facing task-listing visibility" },
+        { label: "Keycloak", detail: "SSO and role-based access control" },
+      ],
       impact: [
         "10% workflow execution improvement",
         "15% faster report generation",
@@ -205,6 +221,14 @@ export const systems: SystemEntry[] = [
       ],
       architectureSummary:
         "Ingestion through Kinesis, transformation microservices, Drools for complex normalization, S3/DynamoDB/Lambda supporting batch and stream paths.",
+      architectureFlow: [
+        { label: "Vehicle Fleets", detail: "Binary, XML, and non-standard JSON inputs" },
+        { label: "S3 / Kinesis", detail: "Raw ingestion and real-time stream processing" },
+        { label: "Spring Boot Transformers", detail: "Format-specific normalization logic" },
+        { label: "Drools Rules", detail: "Centralized transformation rules" },
+        { label: "Canonical JSON", detail: "Unified telemetry schema" },
+        { label: "DynamoDB / Dashboard", detail: "Persistent telemetry and fleet visibility" },
+      ],
       impact: ["100+ GB processed", "~30% faster transformation", "Supported hybrid real-time and batch"],
       improveNow: [
         "Schema registry for canonical models",
@@ -257,6 +281,14 @@ export const systems: SystemEntry[] = [
       ],
       architectureSummary:
         "Flutter clients, Node REST tier, Cloud SQL, VPC-scoped services, GitLab CI/CD to scripted deploys.",
+      architectureFlow: [
+        { label: "Flutter Clients", detail: "Patient, doctor, pharmacy, admin surfaces" },
+        { label: "Node REST API", detail: "JWT-scoped business operations" },
+        { label: "Cloud SQL", detail: "Transactional persistence" },
+        { label: "GCP Networking", detail: "VPC-isolated services" },
+        { label: "GitLab CI/CD", detail: "Runner-driven deploys to Compute Engine" },
+        { label: "Monitoring Hooks", detail: "Operational visibility for solo ownership" },
+      ],
       impact: ["Four roles supported", "Repeatable zero-touch deploys", "Coherent security model"],
       improveNow: [
         "Load testing earlier in the release cycle",
@@ -304,6 +336,14 @@ export const systems: SystemEntry[] = [
       ],
       architectureSummary:
         "Python batch workers, image preprocessing stages, OCR, validation rules before handoff.",
+      architectureFlow: [
+        { label: "Scan Batch", detail: "IRS form images ingested in windows" },
+        { label: "OpenCV Preprocess", detail: "Deskew, denoise, binarize" },
+        { label: "Tesseract OCR", detail: "Field and line extraction" },
+        { label: "Validation Rules", detail: "Regex and form-recognition checks" },
+        { label: "Exception Queue", detail: "Operator review for low confidence" },
+        { label: "Downstream Systems", detail: "Structured data handoff" },
+      ],
       impact: ["~30% less manual cleanup", "Accuracy above 95% in scope"],
       improveNow: [
         "ML-based layout detection for heterogeneous scans",

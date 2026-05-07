@@ -25,8 +25,8 @@ export function MetricCard({ value, label, description, linkedTo }: MetricCardPr
   );
 
   const className = cn(
-    "group block h-full rounded-xl border border-line bg-panel/80 p-6 transition-colors",
-    "hover:border-accent/40 hover:bg-panel",
+    "metric-card-edge group card-hover block h-full rounded-xl border border-line bg-panel/80 p-6",
+    "hover:bg-panel",
     linkedTo && "focus-within:ring-2 focus-within:ring-signal",
   );
 

@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils";
 
 type SectionHeaderProps = {
+  /** Sets `id` on the `<h2>` for `aria-labelledby`. */
+  id?: string;
   eyebrow: string;
   title: string;
   description?: string;
@@ -8,6 +10,7 @@ type SectionHeaderProps = {
 };
 
 export function SectionHeader({
+  id,
   eyebrow,
   title,
   description,
@@ -18,7 +21,10 @@ export function SectionHeader({
       <p className="font-mono-label text-xs uppercase tracking-[0.2em] text-signal">
         {eyebrow}
       </p>
-      <h2 className="font-display mt-2 text-4xl uppercase tracking-wide text-ink md:text-5xl lg:text-6xl">
+      <h2
+        id={id}
+        className="font-display mt-2 text-4xl uppercase tracking-wide text-ink md:text-5xl lg:text-6xl"
+      >
         {title}
       </h2>
       {description ? (

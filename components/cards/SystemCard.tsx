@@ -48,7 +48,8 @@ export function SystemCard({
     </>
   );
 
-  const shell = "block h-full rounded-xl border border-line bg-panel/70 p-5 transition-colors hover:border-accent/35";
+  const shell =
+    "card-hover block h-full rounded-xl border border-line bg-panel/70 p-5 hover:border-signal/30";
 
   if (link) {
     return (
