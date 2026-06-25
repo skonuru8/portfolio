@@ -47,7 +47,7 @@ export function HowIThink() {
 
         <div className="grid gap-4 md:grid-cols-3">
           {cards.map((c, i) => (
-            <Reveal key={c.title} delay={i * 0.06}>
+            <Reveal key={c.title} delay={i * 0.06} direction={i % 2 === 0 ? "left" : "right"}>
               <article className="card-hover h-full rounded-xl border border-line bg-panel/60 p-5">
                 <h3 className="font-display text-xl uppercase tracking-wide text-ink">{c.title}</h3>
                 <p className="mt-3 text-sm text-ink-muted">{c.body}</p>

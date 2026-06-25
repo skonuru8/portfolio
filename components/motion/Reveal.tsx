@@ -8,7 +8,35 @@ type RevealProps = {
   children: React.ReactNode;
   className?: string;
   delay?: number;
+  direction?: "up" | "left" | "right" | "center";
 };
+
+function getInitial(direction: RevealProps["direction"]) {
+  switch (direction) {
+    case "left":
+      return { opacity: 0, x: -20, y: 0 };
+    case "right":
+      return { opacity: 0, x: 20, y: 0 };
+    case "center":
+      return { opacity: 0, scale: 0.96 };
+    case "up":
+    default:
+      return { opacity: 0, y: 16 };
+  }
+}
+
+function getAnimate(direction: RevealProps["direction"]) {
+  switch (direction) {
+    case "left":
+    case "right":
+      return { opacity: 1, x: 0, y: 0 };
+    case "center":
+      return { opacity: 1, scale: 1 };
+    case "up":
+    default:
+      return { opacity: 1, y: 0 };
+  }
+}
 
 /**
  * Tier A: bidirectional — fades up on enter, fades back down on leave (once: false).
@@ -17,7 +45,7 @@ type RevealProps = {
  *
  * To revert ALL tiers to one-shot, flip `once: false` → `once: true` on the Tier A branch.
  */
-export function Reveal({ children, className, delay = 0 }: RevealProps) {
+export function Reveal({ children, className, delay = 0, direction = "up" }: RevealProps) {
   const reduce = useReducedMotion();
   const tier = useDeviceTier();
 
@@ -28,8 +56,8 @@ export function Reveal({ children, className, delay = 0 }: RevealProps) {
   return (
     <motion.div
       className={cn(className)}
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={getInitial(direction)}
+      whileInView={getAnimate(direction)}
       viewport={{
         // Tier A: bidirectional (reverse on scroll-up)
         // Tier B: one-shot (fire once, no reverse — halves active animations when scrolling back)

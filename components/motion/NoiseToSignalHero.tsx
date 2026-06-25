@@ -68,21 +68,39 @@ function SignalLine({
   };
 
   return (
-    <motion.div
-      className="absolute"
-      style={lineStyle}
-      initial={{ opacity: 0, scaleX: 0 }}
-      animate={{
-        opacity: inView ? 0.6 : 0,
-        scaleX: inView ? 1 : 0,
-      }}
-      transition={{
-        duration: 0.5,
-        ease: "easeOut",
-        // delay only applies on the way in (line draws after morph completes)
-        delay: inView ? delay : 0,
-      }}
-    />
+    <>
+      <motion.div
+        className="absolute"
+        style={lineStyle}
+        initial={{ opacity: 0, scaleX: 0 }}
+        animate={{
+          opacity: inView ? 0.6 : 0,
+          scaleX: inView ? 1 : 0,
+        }}
+        transition={{
+          duration: 0.5,
+          ease: "easeOut",
+          // delay only applies on the way in (line draws after morph completes)
+          delay: inView ? delay : 0,
+        }}
+      />
+      {/* Pulse wave — fires once after line draws */}
+      <motion.div
+        className="absolute"
+        style={{ ...lineStyle, transformOrigin: "left center" }}
+        initial={{ opacity: 0, scaleX: 0 }}
+        animate={inView ? {
+          opacity: [0, 0, 0.9, 0],
+          scaleX: [0, 0, 1, 1],
+        } : { opacity: 0, scaleX: 0 }}
+        transition={{
+          duration: 1.2,
+          delay: inView ? delay + 0.1 : 0,
+          ease: "easeOut",
+          times: [0, 0.3, 0.6, 1],
+        }}
+      />
+    </>
   );
 }
 

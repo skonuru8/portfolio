@@ -8,6 +8,7 @@ import { AmbientShell } from "@/components/layout/AmbientShell";
 import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import { DeviceTierAttribute } from "@/components/layout/DeviceTierAttribute";
 import { getSiteUrl } from "@/lib/site-url";
+import { ThemeProvider } from "@/lib/theme";
 
 const bebas = Bebas_Neue({
   weight: "400",
@@ -48,9 +49,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-theme="dark"
       className={`${bebas.variable} ${syne.variable} ${spaceMono.variable} h-full antialiased`}
     >
       <body className="grain min-h-full bg-bg text-ink">
+        <ThemeProvider>
         <AmbientShell>
           <DeviceTierAttribute />
           <ScrollProgress />
@@ -67,6 +70,7 @@ export default function RootLayout({
           <Footer />
           <CommandMenuLoader />
         </AmbientShell>
+        </ThemeProvider>
       </body>
     </html>
   );

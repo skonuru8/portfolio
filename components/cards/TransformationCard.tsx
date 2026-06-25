@@ -6,6 +6,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { ConnectorArrow } from "@/components/motion/ConnectorArrow";
 import { cn } from "@/lib/utils";
 import { useDeviceTier } from "@/lib/device-tier";
+import { TiltCard } from "@/components/motion/TiltCard";
 
 export type TransformationCardProps = {
   title: string;
@@ -41,7 +42,8 @@ export function TransformationCard({
   const variant: DollyVariant | undefined = useDolly ? (motionType as DollyVariant) : undefined;
 
   const body = (
-    <article className="card-hover rounded-2xl border border-line bg-bg-soft/90 p-6 md:p-8">
+    <TiltCard>
+    <article className="group card-hover rounded-2xl border border-line bg-bg-soft/90 p-6 md:p-8">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <h3 className="font-display text-2xl uppercase tracking-wide text-ink md:text-3xl">
           {title}
@@ -55,7 +57,8 @@ export function TransformationCard({
         {/* Before panel — animated noise blob on Tier A, static on Tier B/C */}
         <div
           className={cn(
-            "relative overflow-hidden rounded-lg border border-line/80 bg-panel/50 p-4",
+            "relative overflow-hidden rounded-lg border border-line/80 bg-panel/50 p-4 transition-all duration-300",
+            "group-hover:opacity-75 group-hover:[filter:blur(0.5px)]",
             motionType !== "none" && "md:opacity-95",
           )}
         >
@@ -77,7 +80,7 @@ export function TransformationCard({
         </div>
 
         {/* After panel */}
-        <div className="rounded-lg border border-line/80 bg-panel/50 p-4">
+        <div className="rounded-lg border border-line/80 bg-panel/50 p-4 transition-all duration-300 group-hover:border-signal/40 group-hover:bg-signal-soft/20">
           <p className="font-mono-label text-[10px] uppercase tracking-widest text-accent">After</p>
           <p className="mt-2 text-sm text-ink-muted">{after}</p>
         </div>
@@ -104,6 +107,7 @@ export function TransformationCard({
         Full case study
       </Link>
     </article>
+    </TiltCard>
   );
 
   return (

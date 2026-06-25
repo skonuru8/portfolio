@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Moon, Sun, Sparkles } from "lucide-react";
 import { profile } from "@/data/profile";
 import { MagneticLink } from "@/components/motion/MagneticLink";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/lib/theme";
 
 const SECTION_LINKS = [
   { href: "/#impact", label: "Impact" },
@@ -22,6 +23,7 @@ const OPEN_CMD = "portfolio:open-command-palette";
 export function NavbarClient({ pdfReady }: { pdfReady: boolean }) {
   const [open, setOpen] = useState(false);
   const [modKey, setModKey] = useState("⌘");
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const id = requestAnimationFrame(() => {
@@ -37,7 +39,10 @@ export function NavbarClient({ pdfReady }: { pdfReady: boolean }) {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-bg/90 backdrop-blur-md">
+    <header className={cn(
+      "sticky top-0 z-40 border-b border-line bg-bg/90 backdrop-blur-md",
+      theme === "remix" && "remix-navbar"
+    )}>
       <nav
         className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 md:px-6"
         aria-label="Primary"
@@ -72,6 +77,43 @@ export function NavbarClient({ pdfReady }: { pdfReady: boolean }) {
               </MagneticLink>
             </li>
           ) : null}
+          <li>
+            <div className="flex items-center gap-1 border-l border-line pl-2 ml-1">
+              <button
+                type="button"
+                aria-label="Dark mode"
+                onClick={() => setTheme("dark")}
+                className={cn(
+                  "focus-ring rounded p-1.5 transition-colors",
+                  theme === "dark" ? "text-accent" : "text-ink-muted hover:text-ink"
+                )}
+              >
+                <Moon className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                aria-label="Light mode"
+                onClick={() => setTheme("light")}
+                className={cn(
+                  "focus-ring rounded p-1.5 transition-colors",
+                  theme === "light" ? "text-accent" : "text-ink-muted hover:text-ink"
+                )}
+              >
+                <Sun className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                aria-label="Remix mode"
+                onClick={() => setTheme("remix")}
+                className={cn(
+                  "focus-ring rounded p-1.5 transition-colors",
+                  theme === "remix" ? "text-accent" : "text-ink-muted hover:text-ink"
+                )}
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </li>
           <li>
             <button
               type="button"

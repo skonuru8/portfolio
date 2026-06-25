@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
+import { TiltCard } from "@/components/motion/TiltCard";
 
 export type AwardCardProps = {
   title: string;
@@ -18,7 +19,7 @@ export function AwardCard({ title, organization, year, description, image }: Awa
 
   return (
     <>
-      <article className="rounded-xl border border-line bg-panel/60 p-5">
+      <TiltCard className="rounded-xl border border-line bg-panel/60 p-5">
         <button
           type="button"
           className="focus-ring group w-full text-left outline-none"
@@ -46,7 +47,7 @@ export function AwardCard({ title, organization, year, description, image }: Awa
           {organization} · {year}
         </p>
         <p className="mt-2 text-sm text-ink-muted">{description}</p>
-      </article>
+      </TiltCard>
 
       {hasImage ? (
         <Dialog.Root open={open} onOpenChange={setOpen}>

@@ -32,6 +32,52 @@
   --line: var(--border);
 }
 
+/* Light mode */
+html[data-theme="light"] {
+  --bg: #eef6fb;
+  --bg-soft: #e4f0f8;
+  --panel: #f0f7fc;
+  --panel-strong: #ede9e2;
+  --ink: #1a1714;
+  --ink-muted: #6b6358;
+  --ink-soft: #8a837a;
+  --border: rgba(100, 160, 210, 0.18);
+  --border-strong: rgba(13, 100, 110, 0.28);
+  --accent: #0e7490;
+  --accent-soft: rgba(14, 116, 144, 0.10);
+  --signal: #0f766e;
+  --signal-soft: rgba(15, 118, 110, 0.10);
+  --deep: #6d28d9;
+  --deep-soft: rgba(109, 40, 217, 0.10);
+  --lock: #b45309;
+  --lock-soft: rgba(180, 83, 9, 0.10);
+  --lock-glow: rgba(180, 83, 9, 0.30);
+  --success: #0f766e;
+}
+
+/* Remix mode — dark base, psychedelic overlays handled via canvas/JS */
+html[data-theme="remix"] {
+  --bg: #020617;
+  --bg-soft: #07111f;
+  --panel: #0b172a;
+  --panel-strong: #102033;
+  --ink: #f0f8ff;
+  --ink-muted: #94a3b8;
+  --ink-soft: #7086a0;
+  --border: rgba(148, 163, 184, 0.18);
+  --border-strong: rgba(200, 150, 255, 0.35);
+  --accent: #a855f7;
+  --accent-soft: rgba(168, 85, 247, 0.18);
+  --signal: #22d3ee;
+  --signal-soft: rgba(34, 211, 238, 0.14);
+  --deep: #ec4899;
+  --deep-soft: rgba(236, 72, 153, 0.16);
+  --lock: #facc15;
+  --lock-soft: rgba(250, 204, 21, 0.14);
+  --lock-glow: rgba(250, 204, 21, 0.45);
+  --success: #4ade80;
+}
+
 @theme inline {
   --color-bg: var(--bg);
   --color-bg-soft: var(--bg-soft);
@@ -419,4 +465,40 @@ html[data-tier="b"] .hero-signal::after {
     transition: none;
     transform: scaleX(1);
   }
+}
+
+/* Remix navbar iridescent shimmer */
+.remix-navbar {
+  background: linear-gradient(
+    90deg,
+    rgba(34, 211, 238, 0.12),
+    rgba(168, 85, 247, 0.12),
+    rgba(236, 72, 153, 0.10),
+    rgba(250, 204, 21, 0.10),
+    rgba(34, 211, 238, 0.12)
+  );
+  background-size: 300% 100%;
+  animation: iridescent-shift 6s linear infinite;
+}
+
+@keyframes iridescent-shift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+/* Remix mode marquee color cycling */
+@keyframes hue-cycle {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+/* Marquee scroll */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.remix-marquee-text {
+  animation: marquee-scroll 28s linear infinite, hue-cycle 6s linear infinite;
+  color: var(--signal);
 }

@@ -6,11 +6,13 @@ import { WorkIndex } from "@/components/home/WorkIndex";
 import { RecognitionPreview } from "@/components/home/RecognitionPreview";
 import { ContactPanel } from "@/components/home/ContactPanel";
 import { SectionDivider } from "@/components/layout/SectionDivider";
+import { Marquee } from "@/components/motion/Marquee";
 
 export default function HomePage() {
   return (
     <>
       <Hero />
+      <Marquee />
       <SectionDivider />
       <ImpactMetrics />
       <SectionDivider />

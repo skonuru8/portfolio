@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import { useInView, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useDeviceTier } from "@/lib/device-tier";
+import { TiltCard } from "@/components/motion/TiltCard";
 
 export type MetricCardProps = {
   value: string;
@@ -23,14 +24,6 @@ function parseValue(val: string): { prefix: string; num: number; suffix: string 
 /** Approximate cubic-bezier(0.22, 1, 0.36, 1). */
 function easeOut(t: number): number {
   return 1 - Math.pow(1 - t, 3);
-}
-
-/** Updates `--mx` / `--my` on the card for the ::after cursor mini-aura. CSS-only — no React state. */
-function onMouseMove(e: React.MouseEvent<HTMLElement>) {
-  const target = e.currentTarget;
-  const rect = target.getBoundingClientRect();
-  target.style.setProperty("--mx", `${e.clientX - rect.left}px`);
-  target.style.setProperty("--my", `${e.clientY - rect.top}px`);
 }
 
 export function MetricCard({ value, label, description, linkedTo }: MetricCardProps) {
@@ -98,19 +91,14 @@ export function MetricCard({ value, label, description, linkedTo }: MetricCardPr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, reduce, tier]);
 
-  // Tier B: omit metric-card-aura (radial gradient on GPU is moderately expensive on weak GPUs)
   const cardClass = cn(
     "metric-card-edge group card-hover relative block h-full overflow-hidden rounded-xl border border-line bg-panel/80 p-6",
-    tier === "a" && "metric-card-aura",
     "hover:bg-panel",
     linkedTo && "focus-within:ring-2 focus-within:ring-signal",
   );
 
   // Reduced motion: final value statically. Lean/animated: start at 0 — effect counts up.
   const initialDisplay = reduce ? value : parsed ? `${parsed.prefix}0${parsed.suffix}` : value;
-
-  // Tier B: skip onMouseMove (no aura to position)
-  const moveHandler = tier === "a" ? onMouseMove : undefined;
 
   const inner = (
     <>
@@ -132,24 +120,21 @@ export function MetricCard({ value, label, description, linkedTo }: MetricCardPr
   if (linkedTo) {
     return (
       <div ref={inViewRef}>
-        <Link
-          href={linkedTo}
-          className={cn(cardClass, "focus-ring outline-none")}
-          onMouseMove={moveHandler as React.MouseEventHandler<HTMLAnchorElement>}
-        >
-          {inner}
-        </Link>
+        <TiltCard>
+          <Link
+            href={linkedTo}
+            className={cn(cardClass, "focus-ring outline-none")}
+          >
+            {inner}
+          </Link>
+        </TiltCard>
       </div>
     );
   }
 
   return (
-    <div
-      ref={inViewRef}
-      className={cardClass}
-      onMouseMove={moveHandler as React.MouseEventHandler<HTMLDivElement>}
-    >
-      {inner}
+    <div ref={inViewRef}>
+      <TiltCard className={cardClass}>{inner}</TiltCard>
     </div>
   );
 }

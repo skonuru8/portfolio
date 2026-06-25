@@ -2,17 +2,21 @@
 
 import Link from "next/link";
 import { useRef } from "react";
-import { useInView } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { Code2, Link2, FileDown } from "lucide-react";
 import { profile } from "@/data/profile";
 import { NoiseToSignalHero } from "@/components/motion/NoiseToSignalHero";
 import { ParallaxLayer } from "@/components/motion/ParallaxLayer";
 import { ExternalLink } from "@/components/ui/ExternalLink";
+import { useTheme } from "@/lib/theme";
 
 export function HeroClient({ pdfReady }: { pdfReady: boolean }) {
   const sectionRef = useRef<HTMLElement>(null);
+  const reduce = useReducedMotion();
+  const { theme } = useTheme();
   // Same threshold as NoiseToSignalHero — underline tracks the same viewport event
   const inView = useInView(sectionRef, { margin: "0px 0px -20% 0px" });
+  const words = profile.headline.split(" ");
 
   return (
     <section
@@ -29,7 +33,9 @@ export function HeroClient({ pdfReady }: { pdfReady: boolean }) {
         aria-hidden
       />
       <div className="pointer-events-none absolute inset-0 liquid-bg" aria-hidden />
-      <div className="pointer-events-none absolute inset-0 grid-lines opacity-30" aria-hidden />
+      {theme !== "remix" && (
+        <div className="pointer-events-none absolute inset-0 grid-lines opacity-30" aria-hidden />
+      )}
       <NoiseToSignalHero />
       <ParallaxLayer offset={72} className="z-10 mx-auto max-w-6xl px-4 md:px-6">
         <p className="font-mono-label text-xs uppercase tracking-[0.28em] text-signal">
@@ -38,8 +44,25 @@ export function HeroClient({ pdfReady }: { pdfReady: boolean }) {
             signal
           </span>
         </p>
-        <h1 className="font-display mt-4 max-w-4xl text-3xl uppercase leading-[0.95] tracking-wide text-ink xs:text-5xl md:text-7xl lg:text-8xl">
-          {profile.headline}
+        <h1
+          className="font-display mt-4 max-w-4xl text-3xl uppercase leading-[0.95] tracking-wide text-ink xs:text-5xl md:text-7xl lg:text-8xl"
+          style={{ display: "flex", flexWrap: "wrap", columnGap: "0.25em", rowGap: "0" }}
+        >
+          {words.map((word, i) =>
+            reduce ? (
+              <span key={i}>{word}{i < words.length - 1 ? " " : ""}</span>
+            ) : (
+              <motion.span
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 1.8 + i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                style={{ display: "inline-block" }}
+              >
+                {word}
+              </motion.span>
+            )
+          )}
         </h1>
         <p className="mt-6 max-w-2xl text-base text-ink-muted md:text-lg">{profile.subheadline}</p>
 
