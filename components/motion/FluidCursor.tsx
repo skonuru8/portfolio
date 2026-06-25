@@ -460,10 +460,14 @@ function GalaxyCanvas({ theme }: { theme: string }) {
     resize();
     window.addEventListener("resize", resize, { passive: true });
 
-    const onMove  = (e: MouseEvent) => { mouseRef.current = { x: e.clientX, y: e.clientY, active: true }; };
-    const onLeave = ()              => { mouseRef.current.active = false; };
-    window.addEventListener("mousemove",  onMove,  { passive: true });
-    window.addEventListener("mouseleave", onLeave);
+    // Pointer events unify mouse + touch: the gravity well and cursor nebula
+    // now track a finger drag / tap on mobile, not just a desktop mouse.
+    const onMove  = (e: PointerEvent) => { mouseRef.current = { x: e.clientX, y: e.clientY, active: true }; };
+    const onLeave = ()               => { mouseRef.current.active = false; };
+    window.addEventListener("pointermove",   onMove, { passive: true });
+    window.addEventListener("pointerdown",   onMove, { passive: true });
+    window.addEventListener("pointercancel", onLeave);
+    window.addEventListener("mouseleave",    onLeave);
 
     function loop() {
       if (!canvas || !ctx) return;
@@ -591,9 +595,11 @@ function GalaxyCanvas({ theme }: { theme: string }) {
 
     return () => {
       cancelAnimationFrame(rafRef.current);
-      window.removeEventListener("resize",     resize);
-      window.removeEventListener("mousemove",  onMove);
-      window.removeEventListener("mouseleave", onLeave);
+      window.removeEventListener("resize",        resize);
+      window.removeEventListener("pointermove",   onMove);
+      window.removeEventListener("pointerdown",   onMove);
+      window.removeEventListener("pointercancel", onLeave);
+      window.removeEventListener("mouseleave",    onLeave);
     };
   }, [theme]);
 
