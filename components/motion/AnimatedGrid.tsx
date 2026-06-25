@@ -2,127 +2,10 @@
 
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "framer-motion";
+import { useDeviceTier } from "@/lib/device-tier";
 import { useTheme } from "@/lib/theme";
 
 const CELL = 64;
-
-// ─── Spacetime gravity-well ripples (click / tap) ──────────────────────────────
-// A click or tap drops a "well" that warps a local grid mesh into a gravity
-// funnel with an expanding ripple — the classic spacetime-curvature look. Works
-// in every theme and on touch (pointer events), drawn on top of the background.
-type Well = { x: number; y: number; t0: number };
-
-const WELL_DURATION = 1700; // ms — full life of one ripple
-const WELL_MAX      = 5;    // cap concurrent wells
-const WAVE_SPEED    = 0.3;  // px/ms — ripple wavefront speed
-const MESH_CELL     = 30;   // px — mesh line spacing (finer than the bg grid)
-const MESH_STEP     = 10;   // px — subdivision along each mesh line
-const MESH_MAX_R    = 330;  // px — max mesh half-extent
-const CORE_SIGMA    = 70;   // funnel width
-const CORE_AMP      = 24;   // funnel depth (px pulled toward center)
-const RING_SIGMA    = 46;   // ripple ring width
-const RING_AMP      = 14;   // ripple amplitude (px)
-const RING_K        = (Math.PI * 2) / 72; // ripple wavelength ~72px
-
-// Displace one mesh vertex by a single well. Returns [x, y, glow 0–1].
-function warpVertex(
-  px: number, py: number, well: Well, now: number,
-): [number, number, number] {
-  const age = now - well.t0;
-  const life = age / WELL_DURATION;
-  if (life >= 1) return [px, py, 0];
-  const env = Math.sin(Math.PI * life); // smooth 0 → 1 → 0 over the life
-  const front = WAVE_SPEED * age; // expanding wavefront radius
-  const dx = px - well.x;
-  const dy = py - well.y;
-  const d = Math.hypot(dx, dy) || 0.0001;
-  // Funnel: a depression pulling vertices toward the center.
-  const core = Math.exp(-(d * d) / (2 * CORE_SIGMA * CORE_SIGMA));
-  // Ripple: a Gaussian-enveloped wave riding the expanding front.
-  const rd = d - front;
-  const ring = Math.exp(-(rd * rd) / (2 * RING_SIGMA * RING_SIGMA)) * Math.cos(rd * RING_K);
-  const mag = (CORE_AMP * core + RING_AMP * ring) * env;
-  const ux = -dx / d; // unit vector toward center
-  const uy = -dy / d;
-  const glow = Math.min(1, (core * 1.15 + Math.max(0, ring)) * env);
-  return [px + ux * mag, py + uy * mag, glow];
-}
-
-function wellColor(theme: string, now: number): string {
-  if (theme === "remix") {
-    const [r, g, b] = hsl((now * 0.05) % 360, 90, 66);
-    return `rgb(${r}, ${g}, ${b})`;
-  }
-  if (theme === "light") return "rgb(40, 86, 176)";
-  return "rgb(120, 190, 255)";
-}
-
-function rgba(rgb: string, a: number): string {
-  return rgb.replace("rgb(", "rgba(").replace(")", `, ${a})`);
-}
-
-function strokeMesh(ctx: CanvasRenderingContext2D, lineGlow: number, color: string) {
-  const a = Math.min(1, lineGlow);
-  if (a < 0.03) return; // outer lines have ~no warp — skip them
-  ctx.globalAlpha = Math.min(0.9, a * 0.95);
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 1.1;
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 7 * a;
-  ctx.stroke();
-}
-
-// Render one well's warped grid mesh + central aura at the current time.
-function drawWell(ctx: CanvasRenderingContext2D, well: Well, now: number, theme: string) {
-  const age = now - well.t0;
-  const life = age / WELL_DURATION;
-  if (life >= 1) return;
-  const env = Math.sin(Math.PI * life);
-  const front = WAVE_SPEED * age;
-  const R = Math.min(MESH_MAX_R, front + 150);
-  const influence = Math.max(front + 3 * RING_SIGMA, 3 * CORE_SIGMA);
-  const color = wellColor(theme, now);
-
-  // Central aura — a soft glow that hints the funnel depth.
-  const aura = ctx.createRadialGradient(well.x, well.y, 0, well.x, well.y, R * 0.7);
-  aura.addColorStop(0, rgba(color, 0.1 * env));
-  aura.addColorStop(1, rgba(color, 0));
-  ctx.globalAlpha = 1;
-  ctx.fillStyle = aura;
-  ctx.fillRect(well.x - R, well.y - R, R * 2, R * 2);
-
-  const x0 = well.x - R, x1 = well.x + R;
-  const y0 = well.y - R, y1 = well.y + R;
-
-  // Vertical mesh lines (subdivided + warped).
-  for (let gx = Math.ceil(x0 / MESH_CELL) * MESH_CELL; gx <= x1; gx += MESH_CELL) {
-    if (Math.abs(gx - well.x) > influence) continue;
-    let started = false, lineGlow = 0;
-    ctx.beginPath();
-    for (let gy = y0; gy <= y1; gy += MESH_STEP) {
-      const [wx, wy, g] = warpVertex(gx, gy, well, now);
-      if (g > lineGlow) lineGlow = g;
-      if (!started) { ctx.moveTo(wx, wy); started = true; } else ctx.lineTo(wx, wy);
-    }
-    strokeMesh(ctx, lineGlow, color);
-  }
-
-  // Horizontal mesh lines.
-  for (let gy = Math.ceil(y0 / MESH_CELL) * MESH_CELL; gy <= y1; gy += MESH_CELL) {
-    if (Math.abs(gy - well.y) > influence) continue;
-    let started = false, lineGlow = 0;
-    ctx.beginPath();
-    for (let gx = x0; gx <= x1; gx += MESH_STEP) {
-      const [wx, wy, g] = warpVertex(gx, gy, well, now);
-      if (g > lineGlow) lineGlow = g;
-      if (!started) { ctx.moveTo(wx, wy); started = true; } else ctx.lineTo(wx, wy);
-    }
-    strokeMesh(ctx, lineGlow, color);
-  }
-
-  ctx.shadowBlur = 0;
-  ctx.globalAlpha = 1;
-}
 
 type IntersectionDot = {
   col: number;
@@ -265,6 +148,7 @@ function buildBlobs(): Blob[] {
 }
 
 export function AnimatedGrid() {
+  const tier = useDeviceTier();
   const reduce = useReducedMotion();
   const { theme } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -276,9 +160,11 @@ export function AnimatedGrid() {
   const scrollRef = useRef(0);
   const metaImageRef = useRef<ImageData | null>(null);
   const metaCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const wellsRef = useRef<Well[]>([]);
 
-  // Reduced motion: static CSS grid (no animation, no ripples)
+  // Tier B: render nothing
+  if (tier === "b") return null;
+
+  // Reduced motion: static CSS grid
   if (reduce) {
     return (
       <div
@@ -299,7 +185,6 @@ export function AnimatedGrid() {
       scrollRef={scrollRef}
       metaImageRef={metaImageRef}
       metaCanvasRef={metaCanvasRef}
-      wellsRef={wellsRef}
       theme={theme}
     />
   );
@@ -315,7 +200,6 @@ type CanvasProps = {
   scrollRef: React.MutableRefObject<number>;
   metaImageRef: React.MutableRefObject<ImageData | null>;
   metaCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
-  wellsRef: React.MutableRefObject<Well[]>;
   theme: string;
 };
 
@@ -329,7 +213,6 @@ function AnimatedGridCanvas({
   scrollRef,
   metaImageRef,
   metaCanvasRef,
-  wellsRef,
   theme,
 }: CanvasProps) {
   useEffect(() => {
@@ -349,20 +232,11 @@ function AnimatedGridCanvas({
     const ro = new ResizeObserver(resize);
     ro.observe(document.documentElement);
 
-    // Pointer tracking (light mode cursor glow + remix attraction). Pointer
-    // events cover mouse and touch, so the effects react to a finger too.
-    const onPointerMove = (e: PointerEvent) => {
+    // Mouse tracking (light mode cursor glow + remix metaball attraction)
+    const onMouseMove = (e: MouseEvent) => {
       mouseRef.current = { x: e.clientX, y: e.clientY };
     };
-    // A click or tap anywhere drops a spacetime ripple at that point.
-    const onPointerDown = (e: PointerEvent) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY };
-      const wells = wellsRef.current;
-      wells.push({ x: e.clientX, y: e.clientY, t0: performance.now() });
-      if (wells.length > WELL_MAX) wells.splice(0, wells.length - WELL_MAX);
-    };
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
-    window.addEventListener("pointerdown", onPointerDown, { passive: true });
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
 
     // Scroll tracking (remix metaball Y-shift). Always attached; cheap.
     scrollRef.current = window.scrollY;
@@ -607,19 +481,6 @@ function AnimatedGridCanvas({
         ctx.globalAlpha = 1;
       }
 
-      // ── Spacetime gravity-well ripples (click / tap), on top of every theme ──
-      const wells = wellsRef.current;
-      if (wells.length) {
-        for (let i = wells.length - 1; i >= 0; i--) {
-          if (now - wells[i].t0 >= WELL_DURATION) wells.splice(i, 1);
-        }
-        if (wells.length) {
-          ctx.save();
-          for (const w of wells) drawWell(ctx, w, now, theme);
-          ctx.restore();
-        }
-      }
-
       rafRef.current = requestAnimationFrame(draw);
     }
 
@@ -628,8 +489,7 @@ function AnimatedGridCanvas({
     return () => {
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
-      window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", rebuildRivers);
     };

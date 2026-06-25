@@ -30,6 +30,41 @@ const REPEL_R   = 50;
 const MAX_SPEED = 2.2;
 const DRAG      = 0.985;
 
+// Click / tap shockwave — a transient spacetime ripple that warps the stars
+// radially as the wavefront passes, then lets them snap back. No drawn lines —
+// the distortion lives entirely in the displacement of the star field.
+const SHOCK_DURATION = 1500;               // ms — full life of one ripple
+const SHOCK_SPEED    = 0.46;               // px/ms — wavefront speed
+const SHOCK_SIGMA    = 56;                 // ring width
+const SHOCK_AMP      = 30;                 // max radial displacement (px)
+const SHOCK_K        = (Math.PI * 2) / 132; // ripple wavelength
+const SHOCK_MAX      = 5;                   // concurrent ripples
+
+type Shock = { x: number; y: number; t0: number };
+
+// Sum the radial displacement (and a 0–1 glow) at (px,py) from all live ripples.
+function shockDisplace(
+  px: number, py: number, shocks: Shock[], now: number,
+): [number, number, number] {
+  let dx = 0, dy = 0, glow = 0;
+  for (const s of shocks) {
+    const age = now - s.t0;
+    const life = age / SHOCK_DURATION;
+    if (life >= 1) continue;
+    const env = Math.sin(Math.PI * life); // smooth 0 → 1 → 0
+    const front = SHOCK_SPEED * age;
+    const ex = px - s.x, ey = py - s.y;
+    const d = Math.sqrt(ex * ex + ey * ey) || 0.0001;
+    const rd = d - front;
+    const wave = Math.exp(-(rd * rd) / (2 * SHOCK_SIGMA * SHOCK_SIGMA)) * Math.cos(rd * SHOCK_K);
+    const mag = SHOCK_AMP * wave * env;
+    dx += (ex / d) * mag; // radial, outward positive
+    dy += (ey / d) * mag;
+    glow += Math.abs(wave) * env;
+  }
+  return [dx, dy, Math.min(1, glow)];
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // Types
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -441,6 +476,7 @@ function GalaxyCanvas({ theme }: { theme: string }) {
   const rafRef      = useRef(0);
   const sceneRef    = useRef<Scene | null>(null);
   const mouseRef    = useRef({ x: -9999, y: -9999, active: false });
+  const shocksRef   = useRef<Shock[]>([]);
   const rotationRef = useRef(0);
   const t0Ref       = useRef(0);
 
@@ -464,8 +500,15 @@ function GalaxyCanvas({ theme }: { theme: string }) {
     // now track a finger drag / tap on mobile, not just a desktop mouse.
     const onMove  = (e: PointerEvent) => { mouseRef.current = { x: e.clientX, y: e.clientY, active: true }; };
     const onLeave = ()               => { mouseRef.current.active = false; };
+    // A click or tap anywhere drops a spacetime ripple that warps the stars.
+    const onDown  = (e: PointerEvent) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY, active: true };
+      const shocks = shocksRef.current;
+      shocks.push({ x: e.clientX, y: e.clientY, t0: performance.now() });
+      if (shocks.length > SHOCK_MAX) shocks.splice(0, shocks.length - SHOCK_MAX);
+    };
     window.addEventListener("pointermove",   onMove, { passive: true });
-    window.addEventListener("pointerdown",   onMove, { passive: true });
+    window.addEventListener("pointerdown",   onDown, { passive: true });
     window.addEventListener("pointercancel", onLeave);
     window.addEventListener("mouseleave",    onLeave);
 
@@ -483,6 +526,13 @@ function GalaxyCanvas({ theme }: { theme: string }) {
 
       rotationRef.current += ROTATION_SPEED;
       const rot = rotationRef.current;
+
+      // Drop expired click/tap ripples.
+      const nowAbs = performance.now();
+      const shocks = shocksRef.current;
+      for (let i = shocks.length - 1; i >= 0; i--) {
+        if (nowAbs - shocks[i].t0 >= SHOCK_DURATION) shocks.splice(i, 1);
+      }
 
       const { x: mx, y: my, active } = mouseRef.current;
       const isRemix = theme === "remix";
@@ -534,11 +584,19 @@ function GalaxyCanvas({ theme }: { theme: string }) {
         s.ox += s.vx; s.oy += s.vy;
         x += s.vx; y += s.vy;
 
+        // Transient click/tap ripple — visual displacement only, so the field
+        // warps as the wavefront passes and springs back once it's gone.
+        let sglow = 0;
+        if (shocks.length) {
+          const [sdx, sdy, g] = shockDisplace(x, y, shocks, nowAbs);
+          x += sdx; y += sdy; sglow = g;
+        }
+
         if (x < -4 || x > W + 4 || y < -4 || y > H + 4) continue;
 
         const twAmp = s.size < 0.6 ? 0.50 : 0.30;
         const tw = (1 - twAmp) + twAmp * Math.sin(t * s.twinkleSpeed + s.twinklePhase);
-        ctx.globalAlpha = s.alpha * tw;
+        ctx.globalAlpha = Math.min(1, s.alpha * tw * (1 + sglow * 1.6));
 
         let sr = s.r, sg = s.g, sb = s.b;
         if (isRemix)      { [sr, sg, sb] = hslRgb((t * 0.009 + s.hueOffset) % 360, 0.80, 0.72); }
@@ -553,7 +611,11 @@ function GalaxyCanvas({ theme }: { theme: string }) {
 
       // ── 4. Bright stars (diffraction spikes) ─────────────────────────────────
       for (const s of scene.brightStars) {
-        const [x, y] = project(s.baseAngle, s.orbitRadius, rot, cx, cy);
+        let [x, y] = project(s.baseAngle, s.orbitRadius, rot, cx, cy);
+        if (shocks.length) {
+          const [sdx, sdy] = shockDisplace(x, y, shocks, nowAbs);
+          x += sdx; y += sdy;
+        }
         if (x < -60 || x > W + 60 || y < -60 || y > H + 60) continue;
         let br = s.r, bg = s.g, bb = s.b;
         if (isRemix) { [br, bg, bb] = hslRgb((t * 0.007 + s.twinklePhase * 50) % 360, 0.88, 0.74); }
@@ -587,6 +649,47 @@ function GalaxyCanvas({ theme }: { theme: string }) {
         ctx.fillRect(0, 0, W, H);
       }
 
+      // ── 7. Click/tap ripple — a soft luminous wavefront + core glow (no lines) ─
+      for (const sh of shocks) {
+        const age = nowAbs - sh.t0;
+        const life = age / SHOCK_DURATION;
+        if (life >= 1) continue;
+        const env = Math.sin(Math.PI * life);
+        const front = SHOCK_SPEED * age;
+        const inner = Math.max(0, front - SHOCK_SIGMA);
+        const outer = front + SHOCK_SIGMA;
+        const a = 0.12 * env;
+        const ca = 0.08 * env;
+        const h = (t * 0.02) % 360;
+        const ring = ctx.createRadialGradient(sh.x, sh.y, inner, sh.x, sh.y, outer);
+        const core = ctx.createRadialGradient(sh.x, sh.y, 0, sh.x, sh.y, 90);
+        if (isRemix) {
+          ring.addColorStop(0, `hsla(${h},85%,62%,0)`);
+          ring.addColorStop(0.5, `hsla(${h},85%,62%,${a})`);
+          ring.addColorStop(1, `hsla(${h},85%,62%,0)`);
+          core.addColorStop(0, `hsla(${h},85%,62%,${ca})`);
+          core.addColorStop(1, `hsla(${h},85%,62%,0)`);
+        } else if (isLight) {
+          ring.addColorStop(0, "rgba(40,90,180,0)");
+          ring.addColorStop(0.5, `rgba(40,90,180,${a})`);
+          ring.addColorStop(1, "rgba(40,90,180,0)");
+          core.addColorStop(0, `rgba(40,90,180,${ca})`);
+          core.addColorStop(1, "rgba(40,90,180,0)");
+        } else {
+          ring.addColorStop(0, "rgba(120,170,255,0)");
+          ring.addColorStop(0.5, `rgba(120,170,255,${a})`);
+          ring.addColorStop(1, "rgba(120,170,255,0)");
+          core.addColorStop(0, `rgba(120,170,255,${ca})`);
+          core.addColorStop(1, "rgba(120,170,255,0)");
+        }
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = ring;
+        ctx.beginPath(); ctx.arc(sh.x, sh.y, outer, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = core;
+        ctx.beginPath(); ctx.arc(sh.x, sh.y, 90, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
       rafRef.current = requestAnimationFrame(loop);
     }
 
@@ -597,7 +700,7 @@ function GalaxyCanvas({ theme }: { theme: string }) {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener("resize",        resize);
       window.removeEventListener("pointermove",   onMove);
-      window.removeEventListener("pointerdown",   onMove);
+      window.removeEventListener("pointerdown",   onDown);
       window.removeEventListener("pointercancel", onLeave);
       window.removeEventListener("mouseleave",    onLeave);
     };
