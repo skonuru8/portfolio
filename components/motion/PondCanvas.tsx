@@ -377,8 +377,6 @@ export function PondCanvas() {
         field, fctx, img: fctx.createImageData(gw, gh), rays,
       };
 
-      forestTxRef.current = null; // forest crossfade state rebuilt for the new size
-
       // Just a little grass here and there — a few short tufts along the bottom.
       const clusters = Math.round(clamp(W / 360, 3, 7));
       const fronds: Frond[] = [];
@@ -421,7 +419,17 @@ export function PondCanvas() {
       });
     }
     build();
-    window.addEventListener("resize", build, { passive: true });
+    // On mobile the address bar shows/hides while scrolling, firing `resize` with
+    // only a small height change. Ignore those so we don't rebuild every scroll
+    // frame (jank) or reset the forest crossfade. Only real size changes rebuild.
+    let lastW = window.innerWidth, lastH = window.innerHeight;
+    const onResize = () => {
+      const w = window.innerWidth, h = window.innerHeight;
+      if (w === lastW && Math.abs(h - lastH) < 140) return;
+      lastW = w; lastH = h;
+      build();
+    };
+    window.addEventListener("resize", onResize, { passive: true });
 
 
     function disturb(sx: number, sy: number, strength: number) {
@@ -543,10 +551,15 @@ export function PondCanvas() {
         };
 
         let tx = forestTxRef.current;
-        if (!tx || tx.w !== W || tx.h !== H) {
+        if (!tx) {
           const aIdx = (Math.random() * forests.length) | 0;
           tx = { w: W, h: H, aIdx, bIdx: -1, a: buildForestBg(forests[aIdx], W, H), b: null, mode: "hold", phase: 0, tMark: t + FOREST_HOLD };
           forestTxRef.current = tx;
+        } else if (tx.w !== W || tx.h !== H) {
+          // Size changed — rebuild the canvases but keep the crossfade going.
+          tx.w = W; tx.h = H;
+          tx.a = buildForestBg(forests[tx.aIdx], W, H);
+          if (tx.b && tx.bIdx >= 0) tx.b = buildForestBg(forests[tx.bIdx], W, H);
         }
         if (tx.mode === "hold" && forests.length > 1 && t >= tx.tMark) {
           let bIdx = (Math.random() * forests.length) | 0;
@@ -645,7 +658,7 @@ export function PondCanvas() {
 
     return () => {
       cancelAnimationFrame(rafRef.current);
-      window.removeEventListener("resize", build);
+      window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointercancel", onLeave);

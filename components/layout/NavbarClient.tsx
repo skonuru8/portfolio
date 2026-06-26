@@ -20,10 +20,29 @@ const SECTION_LINKS = [
 
 const OPEN_CMD = "portfolio:open-command-palette";
 
+function ThemeToggle({ className }: { className?: string }) {
+  const { theme, setTheme } = useTheme();
+  const btn = (active: boolean) =>
+    cn("focus-ring rounded p-1.5 transition-colors", active ? "text-accent" : "text-ink-muted hover:text-ink");
+  return (
+    <div className={cn("flex items-center gap-1", className)}>
+      <button type="button" aria-label="Dark mode" onClick={() => setTheme("dark")} className={btn(theme === "dark")}>
+        <Moon className="h-4 w-4" />
+      </button>
+      <button type="button" aria-label="Light mode" onClick={() => setTheme("light")} className={btn(theme === "light")}>
+        <Sun className="h-4 w-4" />
+      </button>
+      <button type="button" aria-label="Remix mode" onClick={() => setTheme("remix")} className={btn(theme === "remix")}>
+        <Sparkles className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
+
 export function NavbarClient({ pdfReady }: { pdfReady: boolean }) {
   const [open, setOpen] = useState(false);
   const [modKey, setModKey] = useState("⌘");
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
 
   useEffect(() => {
     const id = requestAnimationFrame(() => {
@@ -78,40 +97,8 @@ export function NavbarClient({ pdfReady }: { pdfReady: boolean }) {
             </li>
           ) : null}
           <li>
-            <div className="flex items-center gap-1 border-l border-line pl-2 ml-1">
-              <button
-                type="button"
-                aria-label="Dark mode"
-                onClick={() => setTheme("dark")}
-                className={cn(
-                  "focus-ring rounded p-1.5 transition-colors",
-                  theme === "dark" ? "text-accent" : "text-ink-muted hover:text-ink"
-                )}
-              >
-                <Moon className="h-3.5 w-3.5" />
-              </button>
-              <button
-                type="button"
-                aria-label="Light mode"
-                onClick={() => setTheme("light")}
-                className={cn(
-                  "focus-ring rounded p-1.5 transition-colors",
-                  theme === "light" ? "text-accent" : "text-ink-muted hover:text-ink"
-                )}
-              >
-                <Sun className="h-3.5 w-3.5" />
-              </button>
-              <button
-                type="button"
-                aria-label="Remix mode"
-                onClick={() => setTheme("remix")}
-                className={cn(
-                  "focus-ring rounded p-1.5 transition-colors",
-                  theme === "remix" ? "text-accent" : "text-ink-muted hover:text-ink"
-                )}
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-              </button>
+            <div className="flex items-center border-l border-line pl-2 ml-1">
+              <ThemeToggle />
             </div>
           </li>
           <li>
@@ -126,7 +113,8 @@ export function NavbarClient({ pdfReady }: { pdfReady: boolean }) {
           </li>
         </ul>
 
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-1.5 md:hidden">
+          <ThemeToggle />
           <button
             type="button"
             aria-label={`${modKey === "⌘" ? "⌘K" : "Ctrl K"} — open command menu`}

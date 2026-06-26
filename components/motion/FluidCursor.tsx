@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "framer-motion";
-import { useDeviceTier } from "@/lib/device-tier";
 import { useTheme } from "@/lib/theme";
 import { PondCanvas } from "./PondCanvas";
 
@@ -714,11 +713,10 @@ function GalaxyCanvas({ theme }: { theme: string }) {
 // ─── Export ───────────────────────────────────────────────────────────────────
 
 export function FluidCursor() {
-  const tier   = useDeviceTier();
   const reduce = useReducedMotion();
   const { theme } = useTheme();
 
-  if (tier !== "a") return null;
+  // Render on mobile/touch too; only reduced-motion users opt out.
   if (reduce) return null;
 
   // Light mode swaps the starfield for a calm pond of drifting leaves & flowers.
