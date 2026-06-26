@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useReducedMotion } from "framer-motion";
 import { useDeviceTier } from "@/lib/device-tier";
 import { useTheme } from "@/lib/theme";
+import { PondCanvas } from "./PondCanvas";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // Constants
@@ -734,5 +735,7 @@ export function FluidCursor() {
   if (tier !== "a") return null;
   if (reduce) return null;
 
+  // Light mode swaps the starfield for a calm pond of drifting leaves & flowers.
+  if (theme === "light") return <PondCanvas />;
   return <GalaxyCanvas theme={theme} />;
 }
