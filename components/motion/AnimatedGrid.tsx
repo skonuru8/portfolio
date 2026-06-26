@@ -164,6 +164,9 @@ export function AnimatedGrid() {
   // Tier B: render nothing
   if (tier === "b") return null;
 
+  // Light mode is a pure-water scene (PondCanvas) — no grid behind it.
+  if (theme === "light") return null;
+
   // Reduced motion: static CSS grid
   if (reduce) {
     return (
@@ -333,41 +336,6 @@ function AnimatedGridCanvas({
             ctx.arc(x, y, 3, 0, Math.PI * 2);
             ctx.fill();
           }
-        }
-
-        ctx.globalAlpha = 1;
-      } else if (theme === "light") {
-        ctx.globalAlpha = 0.6;
-        ctx.strokeStyle = "rgba(120, 100, 80, 0.07)";
-        ctx.lineWidth = 1;
-
-        // Static vertical lines
-        for (let c = 0; c <= cols; c++) {
-          const x = c * CELL;
-          ctx.beginPath();
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, H);
-          ctx.stroke();
-        }
-
-        // Static horizontal lines
-        for (let r = 0; r <= rows; r++) {
-          const y = r * CELL;
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(W, y);
-          ctx.stroke();
-        }
-
-        // Cursor glow
-        const { x: mx, y: my } = mouseRef.current;
-        if (mx >= 0) {
-          const grad = ctx.createRadialGradient(mx, my, 0, mx, my, 180);
-          grad.addColorStop(0, "rgba(180, 120, 40, 0.08)");
-          grad.addColorStop(1, "rgba(180, 120, 40, 0)");
-          ctx.globalAlpha = 1;
-          ctx.fillStyle = grad;
-          ctx.fillRect(0, 0, W, H);
         }
 
         ctx.globalAlpha = 1;

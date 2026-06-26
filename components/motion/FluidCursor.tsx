@@ -537,7 +537,6 @@ function GalaxyCanvas({ theme }: { theme: string }) {
 
       const { x: mx, y: my, active } = mouseRef.current;
       const isRemix = theme === "remix";
-      const isLight = theme === "light";
 
       ctx.clearRect(0, 0, W, H);
 
@@ -600,8 +599,7 @@ function GalaxyCanvas({ theme }: { theme: string }) {
         ctx.globalAlpha = Math.min(1, s.alpha * tw * (1 + sglow * 1.6));
 
         let sr = s.r, sg = s.g, sb = s.b;
-        if (isRemix)      { [sr, sg, sb] = hslRgb((t * 0.009 + s.hueOffset) % 360, 0.80, 0.72); }
-        else if (isLight) { sr = Math.round(sr * 0.22); sg = Math.round(sg * 0.28); sb = Math.round(sb * 0.50 + 55); }
+        if (isRemix) { [sr, sg, sb] = hslRgb((t * 0.009 + s.hueOffset) % 360, 0.80, 0.72); }
 
         if (s.size >= 1.0) { ctx.shadowBlur = s.size * 3.5; ctx.shadowColor = `rgb(${sr},${sg},${sb})`; }
         ctx.fillStyle = `rgb(${sr},${sg},${sb})`;
@@ -638,9 +636,6 @@ function GalaxyCanvas({ theme }: { theme: string }) {
           const h = (t * 0.012) % 360;
           ng.addColorStop(0,   `hsla(${h},78%,34%,0.10)`);
           ng.addColorStop(0.4, `hsla(${(h + 50) % 360},58%,24%,0.04)`);
-        } else if (isLight) {
-          ng.addColorStop(0,   "rgba(38,78,158,0.06)");
-          ng.addColorStop(0.4, "rgba(18,48,118,0.02)");
         } else {
           ng.addColorStop(0,   "rgba(88,48,158,0.08)");
           ng.addColorStop(0.4, "rgba(38,18,98,0.03)");
@@ -670,12 +665,6 @@ function GalaxyCanvas({ theme }: { theme: string }) {
           ring.addColorStop(1, `hsla(${h},85%,62%,0)`);
           core.addColorStop(0, `hsla(${h},85%,62%,${ca})`);
           core.addColorStop(1, `hsla(${h},85%,62%,0)`);
-        } else if (isLight) {
-          ring.addColorStop(0, "rgba(40,90,180,0)");
-          ring.addColorStop(0.5, `rgba(40,90,180,${a})`);
-          ring.addColorStop(1, "rgba(40,90,180,0)");
-          core.addColorStop(0, `rgba(40,90,180,${ca})`);
-          core.addColorStop(1, "rgba(40,90,180,0)");
         } else {
           ring.addColorStop(0, "rgba(120,170,255,0)");
           ring.addColorStop(0.5, `rgba(120,170,255,${a})`);
@@ -707,8 +696,6 @@ function GalaxyCanvas({ theme }: { theme: string }) {
     };
   }, [theme]);
 
-  const isLight = theme === "light";
-
   return (
     <canvas
       ref={canvasRef}
@@ -718,8 +705,7 @@ function GalaxyCanvas({ theme }: { theme: string }) {
         inset:         0,
         pointerEvents: "none",
         zIndex:        1,
-        mixBlendMode:  (isLight ? "multiply" : "screen") as React.CSSProperties["mixBlendMode"],
-        opacity:       isLight ? 0.72 : 1,
+        mixBlendMode:  "screen",
       }}
     />
   );
